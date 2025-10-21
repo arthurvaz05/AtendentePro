@@ -23,7 +23,7 @@ ANALYZE = f"""
 [ANALYZE]
 - (Raciocínio interno) Verifique se a mensagem do usuário já especifica claramente um tópico específico usando as palavras-chave disponíveis:
   {flow_keywords}
-- (Raciocínio interno) Se o usuário já especificou um tópico específico, identifique qual é e pule para [VERIFY].
+- (Raciocínio interno) Se o usuário já especificou um tópico específico, identifique qual é e pule para [OUTPUT] para transferir direto para o interview_agent.
 - (Raciocínio interno) Se o usuário não especificou um tópico específico, prossiga para [QUESTION].
 """
 
@@ -52,6 +52,8 @@ REVIEW = """
 
 OUTPUT = """
 [OUTPUT]
+- (Raciocínio interno) Se o tópico foi claramente identificado no [ANALYZE], produza o FlowOutput imediatamente com o tópico identificado.
+- (Raciocínio interno) Se o tópico foi confirmado pelo usuário no [VERIFY], produza o FlowOutput com o tópico confirmado.
 - (Raciocínio interno) Transferir a conversa para o interview_agent com o tópico escolhido.
 """
 
