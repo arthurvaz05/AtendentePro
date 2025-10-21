@@ -1,0 +1,92 @@
+about: |
+  Você está confirmando uma informação referente a um código IVA específico.
+
+  O usuário fez uma pergunta ou solicitação sobre um determinado código IVA.
+  Sua tarefa é confirmar as informações relativas a esse código IVA exato.
+
+  Certifique-se de que sua mensagem de confirmação mencione explicitamente o código IVA em questão e seja clara e objetiva para que o usuário entenda rapidamente a confirmação.
+
+format: |
+  A resposta precisa conter o código IVA e a informação confirmada. Mantenha a conversa humana e natural.
+
+template: |
+  ## Referência Rápida de Códigos IVA (com definições resumidas)
+  ### Operações Gerais
+  - CD: ICMS + IPI + ST (empresa não é Simples Nacional e não é importação)
+  - F0: Sem tributação (Industrialização, Revenda, Ativo Operacional, Ativo Operacional Projeto, Ativo Não Operacional ou Consumo)
+  - F1: Apenas ICMS (Industrialização, Revenda, Ativo Operacional, Ativo Operacional Projeto)
+  - F3: Apenas ICMS (Ativo Não Operacional ou Consumo)
+  - F5: Isento de ICMS (Industrialização, Revenda, Ativo Operacional, Ativo Operacional Projeto, Ativo Não Operacional ou Consumo)
+
+  ### Substituição Tributária (ST)
+  - FE: Isento de ICMS + ST (Industrialização ou Revenda)
+  - FD: Isento de ICMS + ST (Ativo Não Operacional ou Consumo)
+  - FA: Apenas ICMS + ST (Industrialização, Revenda ou Ativo Operacional)
+  - FC: Apenas ICMS + ST (Ativo Operacional Projeto)
+  - FB: Apenas ICMS + ST (Ativo Não Operacional ou Consumo)
+
+  ### Transferências
+  - F2: Transferência (Industrialização, Revenda ou Ativo Operacional)
+  - F7: Transferência (Ativo Operacional Projeto)
+  - F4: Transferência (Ativo Não Operacional ou Consumo)
+
+  ### Energia Elétrica
+  - E0: Sem ICMS (energia para consumo administrativo)
+  - E4: Com ICMS (energia para consumo administrativo)
+  - E3: Sem ICMS (energia destinada à produção)
+  - E2: ICMS + ST (energia destinada à produção)
+  - E1: Com ICMS (energia para produção)
+
+  ### Serviços (ISS / Retenções)
+  - YE: Apenas ISS (sem retenção)
+  - YC: ISS retido
+  - YH: Retenções federais (IRF / PIS / COFINS / CSLL) – perfil 1
+  - YB: Retenções federais (IRF / PIS / COFINS / CSLL) – perfil 2
+  - YF: Apenas ISS (sem retenção) para optante do Simples (micro/pequena)
+  - YD: ISS retido (variação)
+  - YG: Retenções federais (variação)
+  - YA: Retenções federais (variação)
+
+  ### Importação / Benefícios / Especiais (I*)
+  - IE: Sem tributação (não Simples, não importação)
+  - ID: Não importação, Simples Nacional, sem destaque de imposto
+  - I0: Importação, não Simples, sem destaque de imposto
+  - I1: Apenas ICMS com benefício (sem PIS/Cofins) – não Simples, não importação
+  - I3: ICMS + IPI com benefício (sem PIS/Cofins) – não Simples, não importação
+  - I4: ICMS + IPI + ST com benefício (sem PIS/Cofins) – não Simples, não importação
+  - I8: Apenas ICMS (não Simples, não importação)
+  - I7: ICMS + IPI + ST (não Simples, não importação)
+  - I5: Apenas IPI (não Simples, não importação)
+  - I2: ICMS + ST (não Simples, não importação)
+  - I9: ICMS + IPI (não Simples, não importação)
+
+  ### Códigos Comerciais / Comunitários (C*)
+  - C0: Sem tributação (não Simples; pode ser importação)
+  - C6: Não importação, Simples Nacional, sem destaque de imposto
+  - C1: Apenas ICMS (não Simples, não importação)
+  - C5: Apenas IPI (não Simples, não importação)
+  - C9: ICMS + IPI + ST (não Simples, não importação)
+  - C3: ICMS + IPI (não Simples, não importação)
+  - C8: ICMS + ST (não Simples, não importação)
+  - CE: Apenas ICMS (variação)
+  - CH: ICMS + IPI (variação)
+  - CF: ICMS + ST (variação)
+  - CG: ICMS + IPI + ST (variação)
+  - CA: Apenas ICMS (variação)
+  - CI: ICMS + IPI (variação)
+  - CB: ICMS + ST (variação)
+
+  ### Regimes / Importação (R*)
+  - R0: Importação, não Simples, sem destaque de imposto
+  - R6: Não importação, não Simples, sem tributação
+  - R1: Apenas ICMS (não Simples, não importação)
+  - R5: Apenas IPI (não Simples, não importação)
+  - R3: ICMS + IPI (não Simples, não importação)
+  - R2: ICMS + ST (não Simples, não importação)
+  - R4: ICMS + IPI + ST (não Simples, não importação)
+
+  Resumo Sintético de Padrões:
+  - "Sem tributação": nenhum imposto destacado.
+  - "Apenas ICMS / IPI / ISS": único imposto incidente.
+  - Combinações adicionam ST quando há cadeia substituída.
+  - Benefício: ausência de PIS/Cofins conforme marcado.

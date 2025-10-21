@@ -1,0 +1,56 @@
+{
+  "total_documents": 6,
+  "total_chunks": 41,
+  "document_types": {
+    ".pdf": 6
+  },
+  "document_sizes": {
+    "Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf": {
+      "characters": 4175,
+      "words": 583,
+      "lines": 133
+    },
+    "Processo Manifestação do destinatário_versão humanizada_GIGI.pdf": {
+      "characters": 3088,
+      "words": 470,
+      "lines": 56
+    },
+    "Processo de Cancelamento Extemporâneo_versão humanizada GIGI.pdf": {
+      "characters": 3904,
+      "words": 560,
+      "lines": 76
+    },
+    "Determinação_IVA_ Finalidade_Compra e Aquisição.pdf": {
+      "characters": 7531,
+      "words": 1079,
+      "lines": 154
+    },
+    "Processo Carta de correção_versão humanizada_GIGI.pdf": {
+      "characters": 3053,
+      "words": 455,
+      "lines": 70
+    },
+    "Processo Determinação Código IVA_versão humanizada_GIGI.pdf": {
+      "characters": 9466,
+      "words": 1472,
+      "lines": 190
+    }
+  },
+  "sample_chunks": [
+    {
+      "source": "Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf",
+      "content_preview": " \n \n \nAs informações contidas neste documento são confidenciais e direcionadas para a White Martins e suas subsidiárias.      \nNão podem ser fornecidas a terceiros sem aviso prévio e expresso consenti...",
+      "length": 1000
+    },
+    {
+      "source": "Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf",
+      "content_preview": "nciais e direcionadas para a White Martins e suas subsidiárias.      \nNão podem ser fornecidas a terceiros sem aviso prévio e expresso consentimento da White Martins. \n \n \n \n \n \n \n \n \n \n \n \n \n \n ...",
+      "length": 1000
+    },
+    {
+      "source": "Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf",
+      "content_preview": "cidas a terceiros sem aviso prévio e expresso consentimento da White Martins. \n \n \n \nAs informações contidas neste documento são confidenciais e direcionadas para a White Martins e suas subsidiárias. ...",
+      "length": 1000
+    }
+  ]
+}

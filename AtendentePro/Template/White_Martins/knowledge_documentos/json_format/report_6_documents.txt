@@ -1,0 +1,77 @@
+RAG Agent Test Results Report
+==================================================
+Generated: 2025-10-17 20:45:19
+
+Total Documents Processed: 6
+Total Chunks Created: 41
+
+Document Types:
+  .pdf: 6 files
+
+Document Sizes:
+  Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf:
+    Characters: 4,175
+    Words: 583
+    Lines: 133
+
+  Processo Manifestação do destinatário_versão humanizada_GIGI.pdf:
+    Characters: 3,088
+    Words: 470
+    Lines: 56
+
+  Processo de Cancelamento Extemporâneo_versão humanizada GIGI.pdf:
+    Characters: 3,904
+    Words: 560
+    Lines: 76
+
+  Determinação_IVA_ Finalidade_Compra e Aquisição.pdf:
+    Characters: 7,531
+    Words: 1,079
+    Lines: 154
+
+  Processo Carta de correção_versão humanizada_GIGI.pdf:
+    Characters: 3,053
+    Words: 455
+    Lines: 70
+
+  Processo Determinação Código IVA_versão humanizada_GIGI.pdf:
+    Characters: 9,466
+    Words: 1,472
+    Lines: 190
+
+Sample Chunks:
+  Chunk 1 (from Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf):
+    Length: 1000 characters
+    Preview:  
+ 
+ 
+As informações contidas neste documento são confidenciais e direcionadas para a White Martins e suas subsidiárias.      
+Não podem ser fornecidas a terceiros sem aviso prévio e expresso consenti...
+
+  Chunk 2 (from Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf):
+    Length: 1000 characters
+    Preview: nciais e direcionadas para a White Martins e suas subsidiárias.      
+Não podem ser fornecidas a terceiros sem aviso prévio e expresso consentimento da White Martins. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ ...
+
+  Chunk 3 (from Processo Recebimento de Notas Fiscais_versão humanizada_GIGI.pdf):
+    Length: 1000 characters
+    Preview: cidas a terceiros sem aviso prévio e expresso consentimento da White Martins. 
+ 
+ 
+ 
+As informações contidas neste documento são confidenciais e direcionadas para a White Martins e suas subsidiárias. ...
+

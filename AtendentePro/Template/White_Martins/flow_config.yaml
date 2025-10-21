@@ -1,0 +1,39 @@
+topics:
+  - id: compra_industrializacao
+    label: "Compra Industrialização — material manufaturado ou processo produtivo"
+  - id: compra_comercializacao
+    label: "Compra Comercialização — produto para revenda sem alteração"
+  - id: compra_ativo_operacional
+    label: "Compra Ativo Operacional — máquinas, equipamentos, cilindros (CIAP imediato)"
+  - id: compra_ativo_projeto
+    label: "Compra Ativo Projeto — ativos de projetos em andamento (CIAP após conclusão)"
+  - id: consumo_administrativo_ativo_nao_operacional
+    label: "Consumo Administrativo e Ativo Não Operacional — escritório/limpeza/mesas/cadeiras/computadores"
+  - id: aquisicao_frete
+    label: "Aquisição Frete — serviços de frete"
+  - id: aquisicao_energia_eletrica
+    label: "Aquisição Energia Elétrica — energia (produtiva vs administrativa)"
+  - id: aquisicao_servicos_ligados_a_operacao
+    label: "Aquisição Serviços Ligados à Operação — manutenção produtiva, assistência técnica, engenharia"
+  - id: aquisicao_servicos_nao_ligados_a_operacao
+    label: "Aquisição Serviços Não Ligados à Operação — consultorias, auditorias, inspeções gerais"
+
+keywords:
+  - terms: ["consumo", "material de consumo"]
+    topic: consumo_administrativo_ativo_nao_operacional
+  - terms: ["frete", "transporte"]
+    topic: aquisicao_frete
+  - terms: ["energia", "elétrica"]
+    topic: aquisicao_energia_eletrica
+  - terms: ["industrialização", "manufatura"]
+    topic: compra_industrializacao
+  - terms: ["revenda", "comercialização"]
+    topic: compra_comercializacao
+  - terms: ["máquina", "equipamento", "cilindro"]
+    topic: compra_ativo_operacional
+  - terms: ["projeto", "implantação"]
+    topic: compra_ativo_projeto
+  - terms: ["consultoria", "auditoria", "inspeção"]
+    topic: aquisicao_servicos_nao_ligados_a_operacao
+  - terms: ["manutenção produtiva", "assistência técnica", "engenharia"]
+    topic: aquisicao_servicos_ligados_a_operacao

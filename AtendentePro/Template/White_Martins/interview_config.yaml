@@ -1,0 +1,130 @@
+
+
+
+interview_questions: |
+  1. Compra para Industrialização — material manufaturado ou processo produtivo
+     1.1 A compra é uma importação?
+         - Se *SIM* - Se for uma importação, transfira a conversa para o answer_agent.
+         - Se *NÃO*
+     1.2 O fornecedor é optante pelo Simples Nacional?
+         - Se *SIM*
+         - Se *NÃO*
+         - Se *NÃO SEI*: consulte https://www8.receita.fazenda.gov.br/simplesnacional/aplicacoes.aspx?id=21.
+     1.3 Quais impostos serão destacados?
+         a) Sem tributação
+         b) Apenas ICMS
+         c) Apenas IPI
+         d) ICMS + IPI
+         e) ICMS + ST
+         f) ICMS + IPI + ST
+     1.4 O fornecedor é beneficiado e não houve incidência de PIS/Cofins?
+         a) Sim
+         b) Não
+
+  2. Compra para Comercialização — produto para revenda sem alteração
+     2.1 A compra é uma importação?
+         - Se *SIM* - Se for uma importação, transfira a conversa para o answer_agent
+         - Se *NÃO*
+     2.2 O fornecedor é optante pelo Simples Nacional?
+         - Se *SIM*
+         - Se *NÃO*
+         - Se *NÃO SEI*: consulte o link acima.
+     2.3 Quais impostos serão destacados?
+         a) Sem tributação
+         b) Apenas ICMS
+         c) Apenas IPI
+         d) ICMS + IPI
+         e) ICMS + ST
+         f) ICMS + IPI + ST
+
+  3. Compra de Ativo Operacional — máquinas, equipamentos, cilindros (CIAP imediato)
+     3.1 A compra é uma importação?
+         - Se *SIM* - Se for uma importação, transfira a conversa para o answer_agent.
+         - Se *NÃO*
+     3.2 O fornecedor é optante pelo Simples Nacional?
+         - Se *SIM*
+         - Se *NÃO*
+         - Se *NÃO SEI*: consulte o link.
+     3.3 Quais impostos serão destacados?
+         a) Sem tributação
+         b) Apenas ICMS
+         c) Apenas IPI
+         d) ICMS + IPI
+         e) ICMS + ST
+         f) ICMS + IPI + ST
+
+  4. Compra de Ativo de Projeto — ativos em andamento (CIAP após conclusão)
+     4.1 A compra é uma importação?
+         - Se *SIM* - Se for uma importação, transfira a conversa para o answer_agent.
+         - Se *NÃO*
+     4.2 O fornecedor é optante pelo Simples Nacional?
+         - Se *SIM*
+         - Se *NÃO*
+         - Se *NÃO SEI*: consulte o link.
+     4.3 Quais impostos serão destacados?
+         a) Sem tributação
+         b) Apenas ICMS
+         c) Apenas IPI
+         d) ICMS + IPI
+         e) ICMS + ST
+         f) ICMS + IPI + ST
+
+  5. Consumo Administrativo e Ativo Não Operacional — escritório, limpeza, mobiliário, TI
+     5.1 A compra é uma importação?
+         - Se *SIM* - Se for uma importação, transfira a conversa para o answer_agent.
+         - Se *NÃO*
+     5.2 O fornecedor é optante pelo Simples Nacional?
+         - Se *SIM*
+         - Se *NÃO*
+         - Se *NÃO SEI*: consulte o link.
+     5.3 Quais impostos serão destacados?
+         a) Sem tributação
+         b) Apenas ICMS
+         c) Apenas IPI
+         d) ICMS + IPI
+         e) ICMS + ST
+         f) ICMS + IPI + ST
+
+  6. Aquisição de Frete — serviços de transporte
+     6.1 Qual é a operação transportada?
+         a) Industrialização
+         b) Revenda
+         c) Ativo Operacional
+         d) Ativo Operacional Projeto
+         e) Ativo Não Operacional
+         f) Consumo
+     6.2 Qual tipo de tributação se aplica?
+         a) Sem tributação
+         b) Apenas ICMS
+         c) Isento de ICMS
+         d) Isento de ICMS + ST
+         e) Apenas ICMS + ST
+         f) Operação de transferência
+
+  7. Aquisição de Energia Elétrica — produção vs consumo administrativo
+     7.1 Qual é a finalidade da energia?
+         - Se *produção*, prossiga para 7.2.
+         - Se *consumo administrativo*, prossiga para 7.3.
+     7.2 Para produção: qual tributação se aplica?
+         a) ICMS
+         b) ICMS + ST
+         c) Isento de ICMS
+     7.3 Para consumo administrativo: qual tributação se aplica?
+         a) ICMS
+         b) Isento de ICMS
+
+  8. Aquisição de Serviços Ligados à Operação — manutenção, assistência técnica, engenharia
+     8.1 O serviço contratado possui retenção de ISS?
+         - Se *SIM*
+         - Se *NÃO*
+     8.2 O serviço contratado possui retenções federais (IR/PIS/COFINS/CSLL)?
+         - Se *SIM*
+         - Se *NÃO*
+
+  9. Aquisição de Serviços Não Ligados à Operação — consultorias, auditorias, inspeções
+     9.1 O serviço contratado possui retenção de ISS?
+         - Se *SIM*
+         - Se *NÃO*
+     9.2 O serviço contratado possui retenções federais (IR/PIS/COFINS/CSLL)?
+         - Se *SIM*
+         - Se *NÃO*
