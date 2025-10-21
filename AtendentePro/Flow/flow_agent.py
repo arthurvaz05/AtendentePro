@@ -20,6 +20,6 @@ flow_agent = Agent[ContextNote](
         f"{config.RECOMMENDED_PROMPT_PREFIX} "
         f"{flow_prompts_agent}"
     ),
-    handoffs=[],
+    handoffs=[],  # Será configurado pelo agent_network.py
     output_type=FlowOutput,
 )
