@@ -14,7 +14,7 @@ answer_agent = Agent[ContextNote](
     """,
     instructions=f"{config.RECOMMENDED_PROMPT_PREFIX} {answer_prompts_agent}",
     handoffs=[],
-    output_type=AgentOutputSchema(AnswerOutput, strict_json_schema=False),
+    #output_type=AgentOutputSchema(AnswerOutput, strict_json_schema=False),
 )
 
 
