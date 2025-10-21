@@ -126,6 +126,100 @@ All customer customizations live under `Template/`. Each new deployment should u
    ```
 
 
+## Prompt Modules Architecture
+
+Each agent in AtendentePro uses a structured prompt system with modular components. These prompts define the agent's behavior, reasoning process, and interaction patterns.
+
+### Prompt Structure Pattern
+
+All prompt modules follow a consistent structure:
+- **INTRO**: Agent role and primary objective
+- **MODULES**: Sequential workflow steps (internal reasoning)
+- **Step Modules**: Individual processing steps (READ, SUMMARY, EXTRACT, etc.)
+- **Combined Prompt**: Final concatenated instruction set
+
+### Agent Prompt Modules
+
+#### 1. **Triage Agent Prompts** (`Triage/triage_prompts.py`)
+- **Purpose**: Entry point routing and delegation
+- **Structure**: Simple intro with tool usage instructions
+- **Key Features**: Delegates to appropriate specialized agents
+- **Workflow**: Direct tool-based routing without complex reasoning steps
+
+#### 2. **Flow Agent Prompts** (`Flow/flow_prompts.py`)
+- **Purpose**: Topic identification and user confirmation
+- **Workflow**: `[READ] → [SUMMARY] → [QUESTION] → [VERIFY] → [REVIEW] → [OUTPUT]`
+- **Key Features**:
+  - Presents available topics from `flow_template`
+  - Requires explicit user confirmation
+  - Uses `flow_keywords` for topic matching
+  - Validates user responses before proceeding
+- **Output**: `FlowOutput` with selected topic and reasoning
+
+#### 3. **Interview Agent Prompts** (`Interview/interview_prompts.py`)
+- **Purpose**: Structured data collection through guided questions
+- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ROUTE] → [VERIFY] → [REVIEW] → [QUESTIONS]`
+- **Key Features**:
+  - Uses `interview_questions` from configuration
+  - Follows `interview_template` for topic routing
+  - Asks questions sequentially, one at a time
+  - Waits for user responses before proceeding
+- **Important**: Does NOT auto-fill output; requires user interaction first
+
+#### 4. **Answer Agent Prompts** (`Answer/answer_prompts.py`)
+- **Purpose**: Generate final recommendations using templates
+- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ROUTE] → [VERIFY] → [REVIEW] → [FORMAT] → [OUTPUT]`
+- **Key Features**:
+  - Uses `answer_template` for response guidance
+  - Formats responses clearly and objectively
+  - Validates against template requirements
+- **Output**: Structured answer with topic-specific information
+
+#### 5. **Confirmation Agent Prompts** (`Confirmation/confirmation_prompts.py`)
+- **Purpose**: Validate requests and confirm information
+- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [CLARIFY] → [CONFIRMATION] → [REVIEW] → [FORMAT] → [ROLLBACK] → [OUTPUT]`
+- **Key Features**:
+  - Uses `confirmation_template` for validation
+  - Includes rollback mechanism for out-of-scope topics
+  - References `confirmation_about` for scope definition
+  - Falls back to Triage for unrelated topics
+
+#### 6. **Knowledge Agent Prompts** (`Knowledge/knowledge_prompts.py`)
+- **Purpose**: RAG-based document retrieval and response
+- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [CLARIFY] → [METADATA_DOCUMENTOS] → [RAG] → [REVIEW] → [FORMAT] → [ROLLBACK] → [OUTPUT]`
+- **Key Features**:
+  - Uses `knowledge_template` for document metadata
+  - Implements RAG with `go_to_rag` function
+  - Includes document source referencing
+  - Validates responses against reference documents
+- **RAG Process**: Combines document context with user question
+
+#### 7. **Usage Agent Prompts** (`Usage/usage_agent.py`)
+- **Purpose**: System guidance and meta-questions
+- **Structure**: Simple instruction-based approach
+- **Key Features**: Answers questions about system usage and functionality
+
+### Prompt Design Principles
+
+1. **Modularity**: Each step is clearly defined and reusable
+2. **Internal Reasoning**: All processing steps are marked as internal reasoning
+3. **User Interaction**: Clear separation between internal processing and user communication
+4. **Validation**: Multiple verification steps ensure accuracy
+5. **Fallback Mechanisms**: Rollback options for out-of-scope requests
+6. **Template Integration**: Prompts dynamically incorporate configuration templates
+
+### Configuration Integration
+
+Prompts are dynamically enhanced with:
+- **Templates**: From YAML configuration files
+- **Keywords**: For topic matching and routing
+- **Questions**: Structured interview scripts
+- **Metadata**: Document descriptions and usage hints
+
+This architecture ensures consistent behavior while allowing client-specific customization through the Template system.
+
+---
+
 ## Tests
 
 Run the full suite (agent wiring + helpers):
