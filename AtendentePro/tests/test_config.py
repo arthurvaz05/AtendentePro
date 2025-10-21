@@ -20,19 +20,33 @@ import config  # noqa: E402
 
 def test_config_variables_exist():
     """Testa se todas as variáveis de configuração existem."""
-    assert hasattr(config, 'OPENAI_API_KEY')
-    assert hasattr(config, 'CONTEXT_OUTPUT_DIR')
-    assert hasattr(config, 'DEFAULT_MODEL')
-    assert hasattr(config, 'RECOMMENDED_PROMPT_PREFIX')
+    for attr in (
+        "OPENAI_PROVIDER",
+        "OPENAI_API_KEY",
+        "AZURE_API_KEY",
+        "AZURE_API_ENDPOINT",
+        "AZURE_API_VERSION",
+        "CONTEXT_OUTPUT_DIR",
+        "DEFAULT_MODEL",
+        "RECOMMENDED_PROMPT_PREFIX",
+    ):
+        assert hasattr(config, attr)
 
 
-def test_openai_api_key_format():
-    """Testa se a API key tem o formato correto."""
-    api_key = config.OPENAI_API_KEY
-    assert isinstance(api_key, str)
-    assert len(api_key) > 0
-    # OpenAI API keys geralmente começam com 'sk-'
-    assert api_key.startswith('sk-')
+def test_provider_selection():
+    """Garante que o provider configurado é suportado e possui credenciais."""
+    assert config.OPENAI_PROVIDER in ("azure", "openai")
+
+    if config.OPENAI_PROVIDER == "azure":
+        assert isinstance(config.AZURE_API_KEY, str)
+        assert isinstance(config.AZURE_API_ENDPOINT, str)
+        assert isinstance(config.AZURE_API_VERSION, str)
+        assert config.AZURE_API_KEY.strip()
+        assert config.AZURE_API_ENDPOINT.strip()
+        assert config.AZURE_API_VERSION.strip()
+    else:
+        assert isinstance(config.OPENAI_API_KEY, str)
+        assert config.OPENAI_API_KEY.startswith("sk-")
 
 
 def test_context_output_dir():
@@ -61,6 +75,10 @@ def test_recommended_prompt_prefix():
 
 
 def test_environment_variable_set():
-    """Testa se a variável de ambiente OPENAI_API_KEY está definida."""
-    assert os.getenv('OPENAI_API_KEY') is not None
-    assert os.getenv('OPENAI_API_KEY') == config.OPENAI_API_KEY
+    """Testa se a variável de ambiente do provider escolhido está definida."""
+    if config.OPENAI_PROVIDER == "azure":
+        assert os.getenv('AZURE_API_KEY') is not None
+        assert os.getenv('AZURE_API_KEY') == config.AZURE_API_KEY
+    else:
+        assert os.getenv('OPENAI_API_KEY') is not None
+        assert os.getenv('OPENAI_API_KEY') == config.OPENAI_API_KEY

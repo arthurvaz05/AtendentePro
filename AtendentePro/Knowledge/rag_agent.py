@@ -4,7 +4,6 @@ RAG Agent using OpenAI Swarm Framework
 This agent processes documents from the doc folder and provides intelligent answers using RAG.
 """
 
-import os
 import json
 import asyncio
 from pathlib import Path
@@ -22,6 +21,8 @@ import fitz  # PyMuPDF for better PDF handling
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import pickle
+
+from AtendentePro.utils.openai_client import get_async_client, get_provider
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -140,17 +141,13 @@ class DocumentProcessor:
 class RAGAgent:
     """Main RAG agent using OpenAI Swarm agentframework"""
     
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, client: Optional[object] = None):
         # Import config here to avoid circular imports
-        from config import OPENAI_API_KEY
-        
-        self.api_key = api_key or OPENAI_API_KEY
-        if not self.api_key:
-            raise ValueError("OpenAI API key is required. Set it in config.py or pass it to constructor.")
-        
-        # Initialize OpenAI client
-        from openai import OpenAI
-        self.client = OpenAI(api_key=self.api_key)
+        from config import DEFAULT_MODEL
+
+        self.client = client or get_async_client()
+        self.provider = get_provider()
+        self.default_model = DEFAULT_MODEL
         
         # Initialize document processor
         self.doc_processor = DocumentProcessor()
@@ -168,7 +165,7 @@ class RAGAgent:
         # Create embeddings for chunks
         for i, chunk in enumerate(self.doc_processor.chunks):
             try:
-                response = self.client.embeddings.create(
+                response = await self.client.embeddings.create(
                     model="text-embedding-3-large",
                     input=chunk['content']
                 )
@@ -184,11 +181,11 @@ class RAGAgent:
         
         logger.info(f"Successfully embedded {len(self.chunk_embeddings)} chunks")
     
-    def find_relevant_chunks(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    async def find_relevant_chunks(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Find most relevant chunks for a given query"""
         try:
             # Get query embedding
-            response = self.client.embeddings.create(
+            response = await self.client.embeddings.create(
                 model="text-embedding-3-small",
                 input=query
             )
@@ -216,7 +213,7 @@ class RAGAgent:
         logger.info(f"Processing question: {question}")
         
         # Find relevant chunks
-        relevant_chunks = self.find_relevant_chunks(question, top_k=5)
+        relevant_chunks = await self.find_relevant_chunks(question, top_k=5)
         
         if not relevant_chunks:
             return {
@@ -247,8 +244,8 @@ class RAGAgent:
         """
         
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4.1",
+            response = await self.client.chat.completions.create(
+                model=self.default_model,
                 messages=[
                     {"role": "system", "content": """Você é um agente RAG (Geração Aumentada por Recuperação) especializado em equipamentos e materiais de soldagem.
                                                         Seu papel é responder perguntas com base no contexto documental fornecido.
@@ -298,16 +295,15 @@ class RAGAgent:
 async def main():
     """Main function to demonstrate the RAG agent"""
     
-    # Import config
-    from config import OPENAI_API_KEY
-    
-    # Check if API key is available
-    if not OPENAI_API_KEY:
-        print("Please set your OpenAI API key in config.py")
-        return
+    provider = get_provider()
+    print(f"Using OpenAI provider: {provider}")
     
     # Initialize the RAG agent
-    agent = RAGAgent(OPENAI_API_KEY)
+    try:
+        agent = RAGAgent()
+    except RuntimeError as exc:
+        print(f"Please configure your OpenAI credentials: {exc}")
+        return
     
     # Process documents (this will take some time)
     print("Processing documents and creating embeddings...")

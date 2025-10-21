@@ -111,8 +111,9 @@ All customer customizations live under `Template/`. Each new deployment should u
    source venv/bin/activate
    pip install -r requirements.txt  # or sync with pyproject if present
    ```
-2. **Set your OpenAI key**
-   - Edit `AtendentePro/config.py` or export `OPENAI_API_KEY`.
+2. **Configure your model provider**
+   - For Azure OpenAI: set `OPENAI_PROVIDER=azure` and export `AZURE_API_KEY`, `AZURE_API_ENDPOINT`, `AZURE_API_VERSION` (optionally `AZURE_DEPLOYMENT_NAME`).
+   - For OpenAI public API: set `OPENAI_PROVIDER=openai` and export `OPENAI_API_KEY`.
 3. **Launch the triage loop**
    ```bash
    python -m AtendentePro.run_env.run
@@ -124,7 +125,6 @@ All customer customizations live under `Template/`. Each new deployment should u
    python -m AtendentePro.run_env.run triage
    ```
 
----
 
 ## Tests
 
@@ -133,3 +133,14 @@ Run the full suite (agent wiring + helpers):
 ```bash
 venv/bin/pytest AtendentePro
 ```
+
+---
+
+## Debugging in VS Code
+
+This repository includes a `.vscode/launch.json` with two helpful configurations:
+
+- "Python: Debug Current File": Run and debug the currently open Python file in the integrated terminal. It sets `PYTHONPATH` to the workspace root so imports like `AtendentePro.*` work.
+- "Run AtendentePro (choose agent)": Launch the main CLI runner module `AtendentePro.run_env.run` and pick which agent to start (triage, flow, interview, answer, confirmation, knowledge, usage).
+
+To use: open the file you want to debug, then select the "Python: Debug Current File" configuration and start the debugger. Or choose the second configuration and select the agent using the prompt.

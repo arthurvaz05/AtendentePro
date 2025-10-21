@@ -2,7 +2,7 @@
 # Dependências principais do projeto
 
 # OpenAI Agents SDK (core framework)
-openai-agents-python
+openai-agents
 
 # Data validation and serialization
 pydantic>=2.0.0
@@ -15,6 +15,9 @@ PyPDF2>=3.0.0
 python-docx>=0.8.11
 python-pptx>=0.6.21
 PyMuPDF>=1.23.0  # fitz
+
+# Environment management
+python-dotenv>=1.0.0
 
 # Machine Learning and Vector Operations
 numpy>=1.24.0

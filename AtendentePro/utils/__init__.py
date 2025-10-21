@@ -1,3 +1,3 @@
 from __future__ import annotations
 
-__all__ = ["handoff"]
+__all__ = ["handoff", "openai_client"]

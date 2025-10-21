@@ -42,6 +42,8 @@ try:  # noqa: SIM105
 except ImportError:  # pragma: no cover - fallback when executed as script
     import config  # type: ignore  # noqa: E402
 
+from AtendentePro.utils.openai_client import get_async_client
+
 if __package__:
     from ..context import ContextNote  # type: ignore
     from .knowledge_prompts import knowledge_prompts_agent  # type: ignore
@@ -55,7 +57,7 @@ async def go_to_rag(question: str) -> KnowledgeToolResult:
     """Utilize o RAG para responder à pergunta do usuário."""
     logging.info("Processing question: %s", question)
 
-    relevant_chunks = __find_relevant_chunks(question, top_k=3)
+    relevant_chunks = await __find_relevant_chunks(question, top_k=3)
 
     if not relevant_chunks:
         return KnowledgeToolResult(
@@ -96,10 +98,8 @@ async def go_to_rag(question: str) -> KnowledgeToolResult:
     )
 
     try:
-        from openai import OpenAI
-
-        client = OpenAI(api_key=config.OPENAI_API_KEY)
-        completion = client.responses.create(
+        client = get_async_client()
+        completion = await client.responses.create(
             model=getattr(config, "DEFAULT_MODEL", "gpt-4.1"),
             input=[
                 {
@@ -144,15 +144,14 @@ async def go_to_rag(question: str) -> KnowledgeToolResult:
     )
 
 
-def __find_relevant_chunks(query: str, top_k: int = 3):
+async def __find_relevant_chunks(query: str, top_k: int = 3):
     """Find most relevant chunks for a given query."""
     try:
-        from openai import OpenAI
         from sklearn.metrics.pairwise import cosine_similarity
         import numpy as np
 
-        client = OpenAI(api_key=config.OPENAI_API_KEY)
-        response = client.embeddings.create(model="text-embedding-3-large", input=query)
+        client = get_async_client()
+        response = await client.embeddings.create(model="text-embedding-3-large", input=query)
         query_embedding = response.data[0].embedding
 
         chunk_embeddings = load_embeddings()

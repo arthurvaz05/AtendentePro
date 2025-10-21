@@ -8,6 +8,23 @@ from agents import run_demo_loop
 from pathlib import Path
 import sys
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from agents import  set_default_openai_client, set_default_openai_api
+from AtendentePro.utils.openai_client import get_async_client, get_provider
+
+
+client = get_async_client()
+provider = get_provider()
+
+set_default_openai_client(client)
+set_default_openai_api("chat_completions")
+
+print(f"🔧 Usando provider OpenAI: {provider}")
+
+
 if __package__ is None or __package__ == "":
     package_root = Path(__file__).resolve().parents[1]
     if str(package_root.parent) not in sys.path:

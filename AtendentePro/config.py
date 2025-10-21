@@ -1,16 +1,23 @@
 # Configurações do Sistema de Agentes
 import os
+from typing import Literal
 
-# OpenAI API Key (obrigatório para funcionamento dos agentes)
-# Deve ser configurada como variável de ambiente OPENAI_API_KEY
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# Ajuste de estado do provedor
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+AZURE_API_KEY = os.getenv("AZURE_API_KEY")
+AZURE_API_ENDPOINT = os.getenv("AZURE_API_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_API_VERSION = os.getenv("AZURE_API_VERSION") or os.getenv("AZURE_OPENAI_API_VERSION")
+AZURE_DEPLOYMENT_NAME = os.getenv("AZURE_DEPLOYMENT_NAME")
 
-if not OPENAI_API_KEY:
-    raise ValueError(
-        "OPENAI_API_KEY não encontrada! "
-        "Configure a variável de ambiente OPENAI_API_KEY ou crie um arquivo .env "
-        "com sua chave da API OpenAI."
+_provider_env = (os.getenv("OPENAI_PROVIDER") or "").strip().lower()
+
+if _provider_env:
+    OPENAI_PROVIDER: Literal["openai", "azure"] = (
+        "azure" if _provider_env == "azure" else "openai"
     )
+else:
+    OPENAI_PROVIDER = "azure" if AZURE_API_KEY and AZURE_API_ENDPOINT else "openai"
+
 
 # Diretório para salvar contextos
 CONTEXT_OUTPUT_DIR = "context"

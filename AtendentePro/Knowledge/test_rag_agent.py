@@ -19,7 +19,18 @@ except ModuleNotFoundError:  # pragma: no cover - fallback when running standalo
     sys.path.append(str(Path(__file__).resolve().parents[2]))
     from AtendentePro import config  # type: ignore
 
-OPENAI_API_KEY = config.OPENAI_API_KEY
+PROVIDER = getattr(config, "OPENAI_PROVIDER", "openai")
+AZURE_API_KEY = getattr(config, "AZURE_API_KEY", None)
+OPENAI_API_KEY = getattr(config, "OPENAI_API_KEY", None)
+
+
+def _provider_name() -> str:
+    return "Azure" if PROVIDER == "azure" else "OpenAI"
+
+
+def _has_provider_credentials() -> bool:
+    key = AZURE_API_KEY if PROVIDER == "azure" else OPENAI_API_KEY
+    return bool(key and str(key).strip())
 
 # Document processing imports
 import PyPDF2
@@ -358,9 +369,9 @@ def main():
             if file_type.startswith('latest_'):
                 print(f"   📄 {file_type}: {Path(file_path).name}")
         
-        # Check if API key is available
-        if OPENAI_API_KEY and OPENAI_API_KEY.strip():
-            print(f"\n🔑 OpenAI API Key encontrada no config.py!")
+        # Check if credentials are available
+        if _has_provider_credentials():
+            print(f"\n🔑 {_provider_name()} credentials encontradas no config.py!")
             print("💡 Você pode usar o RAG Agent completo com IA:")
             print("   Run: python rag_agent.py")
             
@@ -378,9 +389,9 @@ def main():
             except Exception as e:
                 print(f"❌ Erro ao executar RAG Agent: {e}")
         else:
-            print("\n❌ OpenAI API Key não encontrada no config.py")
+            print(f"\n❌ {_provider_name()} credentials não encontradas no config.py")
             print("💡 Para usar o RAG Agent completo:")
-            print("   1. Configure sua API key no arquivo config.py")
+            print("   1. Configure sua chave no arquivo config.py ou nas variáveis de ambiente")
             print("   2. Run: python rag_agent.py")
         
     except Exception as e:
