@@ -15,8 +15,10 @@ AtendentePro is a multi-agent customer-support workflow built with the OpenAI Ag
    - Can hand off to Flow, Confirmation, Knowledge, or Usage agents.
 
 2. **Flow Agent (`Flow/flow_agent.py`)**
-   - Determines which interview should run or, if enough data exists, whether to request clarification.
-   - Delegates to the Interview agent for structured data collection.
+   - Intelligently identifies topics from user input using keyword matching.
+   - If topic is clearly identified, transfers immediately to Interview Agent.
+   - If topic is ambiguous, presents available topics for user selection.
+   - Focuses on handoff rather than producing structured output.
 
 3. **Interview Agent (`Interview/interview_agent.py`)**
    - Collects detailed answers using prompts defined in `Interview/interview_prompts.py`.
@@ -148,15 +150,16 @@ All prompt modules follow a consistent structure:
 - **Workflow**: Direct tool-based routing without complex reasoning steps
 
 #### 2. **Flow Agent Prompts** (`Flow/flow_prompts.py`)
-- **Purpose**: Intelligent topic identification and user confirmation
+- **Purpose**: Intelligent topic identification and automatic handoff
 - **Workflow**: `[READ] → [SUMMARY] → [ANALYZE] → [QUESTION] → [VERIFY] → [REVIEW] → [OUTPUT]`
 - **Key Features**:
   - **Smart Detection**: `[ANALYZE]` step detects specific topics from user input using `flow_keywords`
-  - **Intelligent Routing**: If topic is clearly identified, skips presentation and goes directly to Interview
+  - **Immediate Transfer**: If topic is clearly identified, transfers immediately to Interview Agent
   - **Fallback Presentation**: Only shows topic list when user input is ambiguous
-  - **Confirmation Required**: Explicit user confirmation before proceeding
+  - **Confirmation Transfer**: When user confirms a topic, transfers immediately to Interview Agent
   - **Keyword Matching**: Uses `flow_keywords` for intelligent topic detection
-- **Output**: `FlowOutput` with selected topic and reasoning
+  - **No Structured Output**: Focuses on handoff rather than producing structured data
+- **Behavior**: Direct handoff to Interview Agent without producing FlowOutput
 
 #### 3. **Interview Agent Prompts** (`Interview/interview_prompts.py`)
 - **Purpose**: Structured data collection through guided questions
@@ -222,7 +225,7 @@ The `[ANALYZE]` step is a key innovation in the prompt architecture that provide
 - **Purpose**: Detect specific topics from user input using keywords
 - **Function**: Analyzes user message against `flow_keywords` to identify clear topic matches
 - **Behavior**: 
-  - If topic is clearly identified → Skip to `[VERIFY]` and proceed directly to Interview
+  - If topic is clearly identified → Transfer immediately to Interview Agent
   - If topic is ambiguous → Continue to `[QUESTION]` for topic presentation
 - **Benefit**: Eliminates unnecessary topic enumeration when user intent is clear
 
