@@ -114,6 +114,7 @@ All customer customizations live under `Template/`. Each new deployment should u
 2. **Configure your model provider**
    - For Azure OpenAI: set `OPENAI_PROVIDER=azure` and export `AZURE_API_KEY`, `AZURE_API_ENDPOINT`, `AZURE_API_VERSION` (optionally `AZURE_DEPLOYMENT_NAME`).
    - For OpenAI public API: set `OPENAI_PROVIDER=openai` and export `OPENAI_API_KEY`.
+   - Optional tracing: set `APPLICATION_INSIGHTS_CONNECTION_STRING` to send Agent traces to Azure Application Insights; omit it (or leave empty) to disable tracing when using the Azure provider.
 3. **Launch the triage loop**
    ```bash
    python -m AtendentePro.run_env.run

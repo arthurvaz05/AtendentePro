@@ -12,12 +12,21 @@ AZURE_DEPLOYMENT_NAME = os.getenv("AZURE_DEPLOYMENT_NAME", "gpt-4o-mini")
 # Credenciais do OpenAI padrão (opcional caso prefira usar a API pública)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
+# Telemetria opcional com Azure Application Insights
+APPLICATION_INSIGHTS_CONNECTION_STRING = os.getenv(
+    "APPLICATION_INSIGHTS_CONNECTION_STRING",
+    "InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://region-0.in.applicationinsights.azure.com/",
+)
+
 # Opcionalmente popular as variáveis de ambiente se não estiverem definidas
 os.environ.setdefault("AZURE_API_KEY", AZURE_API_KEY)
 os.environ.setdefault("AZURE_API_ENDPOINT", AZURE_API_ENDPOINT)
 os.environ.setdefault("AZURE_API_VERSION", AZURE_API_VERSION)
 os.environ.setdefault("AZURE_DEPLOYMENT_NAME", AZURE_DEPLOYMENT_NAME)
 os.environ.setdefault("OPENAI_API_KEY", OPENAI_API_KEY)
+os.environ.setdefault(
+    "APPLICATION_INSIGHTS_CONNECTION_STRING", APPLICATION_INSIGHTS_CONNECTION_STRING
+)
 
 # Provider selecionado: "azure" ou "openai"
 OPENAI_PROVIDER = os.getenv("OPENAI_PROVIDER")

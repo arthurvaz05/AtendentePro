@@ -26,6 +26,7 @@ def test_config_variables_exist():
         "AZURE_API_KEY",
         "AZURE_API_ENDPOINT",
         "AZURE_API_VERSION",
+        "APPLICATION_INSIGHTS_CONNECTION_STRING",
         "CONTEXT_OUTPUT_DIR",
         "DEFAULT_MODEL",
         "RECOMMENDED_PROMPT_PREFIX",
@@ -82,3 +83,9 @@ def test_environment_variable_set():
     else:
         assert os.getenv('OPENAI_API_KEY') is not None
         assert os.getenv('OPENAI_API_KEY') == config.OPENAI_API_KEY
+
+
+def test_application_insights_config_is_str_or_none():
+    """Verifica se a connection string do Application Insights é string ou None."""
+    value = config.APPLICATION_INSIGHTS_CONNECTION_STRING
+    assert value is None or isinstance(value, str)
