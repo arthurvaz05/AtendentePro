@@ -147,32 +147,35 @@ All prompt modules follow a consistent structure:
 - **Workflow**: Direct tool-based routing without complex reasoning steps
 
 #### 2. **Flow Agent Prompts** (`Flow/flow_prompts.py`)
-- **Purpose**: Topic identification and user confirmation
-- **Workflow**: `[READ] → [SUMMARY] → [QUESTION] → [VERIFY] → [REVIEW] → [OUTPUT]`
+- **Purpose**: Intelligent topic identification and user confirmation
+- **Workflow**: `[READ] → [SUMMARY] → [ANALYZE] → [QUESTION] → [VERIFY] → [REVIEW] → [OUTPUT]`
 - **Key Features**:
-  - Presents available topics from `flow_template`
-  - Requires explicit user confirmation
-  - Uses `flow_keywords` for topic matching
-  - Validates user responses before proceeding
+  - **Smart Detection**: `[ANALYZE]` step detects specific topics from user input using `flow_keywords`
+  - **Intelligent Routing**: If topic is clearly identified, skips presentation and goes directly to Interview
+  - **Fallback Presentation**: Only shows topic list when user input is ambiguous
+  - **Confirmation Required**: Explicit user confirmation before proceeding
+  - **Keyword Matching**: Uses `flow_keywords` for intelligent topic detection
 - **Output**: `FlowOutput` with selected topic and reasoning
 
 #### 3. **Interview Agent Prompts** (`Interview/interview_prompts.py`)
 - **Purpose**: Structured data collection through guided questions
-- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ROUTE] → [VERIFY] → [REVIEW] → [QUESTIONS]`
+- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ANALYZE] → [ROUTE] → [QUESTIONS] → [VERIFY] → [REVIEW] → [OUTPUT INSTRUCTIONS]`
 - **Key Features**:
-  - Uses `interview_questions` from configuration
-  - Follows `interview_template` for topic routing
-  - Asks questions sequentially, one at a time
-  - Waits for user responses before proceeding
+  - **Deep Analysis**: `[ANALYZE]` step identifies what information is still needed
+  - **Sequential Questions**: Uses `interview_questions` from configuration
+  - **Topic Routing**: Follows `interview_template` for topic routing
+  - **One-by-One**: Asks questions sequentially, one at a time
+  - **User Interaction**: Waits for user responses before proceeding
 - **Important**: Does NOT auto-fill output; requires user interaction first
 
 #### 4. **Answer Agent Prompts** (`Answer/answer_prompts.py`)
 - **Purpose**: Generate final recommendations using templates
-- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ROUTE] → [VERIFY] → [REVIEW] → [FORMAT] → [OUTPUT]`
+- **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ANALYZE] → [ROUTE] → [VERIFY] → [REVIEW] → [FORMAT] → [OUTPUT]`
 - **Key Features**:
-  - Uses `answer_template` for response guidance
-  - Formats responses clearly and objectively
-  - Validates against template requirements
+  - **Deep Analysis**: `[ANALYZE]` step analyzes available information and identifies response requirements
+  - **Template Integration**: Uses `answer_template` for response guidance
+  - **Clear Formatting**: Formats responses clearly and objectively
+  - **Validation**: Validates against template requirements
 - **Output**: Structured answer with topic-specific information
 
 #### 5. **Confirmation Agent Prompts** (`Confirmation/confirmation_prompts.py`)
@@ -188,10 +191,11 @@ All prompt modules follow a consistent structure:
 - **Purpose**: RAG-based document retrieval and response
 - **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [CLARIFY] → [METADATA_DOCUMENTOS] → [RAG] → [REVIEW] → [FORMAT] → [ROLLBACK] → [OUTPUT]`
 - **Key Features**:
-  - Uses `knowledge_template` for document metadata
-  - Implements RAG with `go_to_rag` function
-  - Includes document source referencing
-  - Validates responses against reference documents
+  - **Document Metadata**: Uses `knowledge_template` for document metadata
+  - **RAG Implementation**: Implements RAG with `go_to_rag` function
+  - **Source Referencing**: Includes document source referencing
+  - **Response Validation**: Validates responses against reference documents
+  - **Fallback Handling**: `[ROLLBACK]` step handles cases where information is not found
 - **RAG Process**: Combines document context with user question
 
 #### 7. **Usage Agent Prompts** (`Usage/usage_agent.py`)
@@ -207,6 +211,37 @@ All prompt modules follow a consistent structure:
 4. **Validation**: Multiple verification steps ensure accuracy
 5. **Fallback Mechanisms**: Rollback options for out-of-scope requests
 6. **Template Integration**: Prompts dynamically incorporate configuration templates
+7. **Intelligent Analysis**: `[ANALYZE]` modules provide deep reasoning capabilities
+
+### The `[ANALYZE]` Module
+
+The `[ANALYZE]` step is a key innovation in the prompt architecture that provides intelligent analysis capabilities:
+
+#### **Flow Agent `[ANALYZE]`**
+- **Purpose**: Detect specific topics from user input using keywords
+- **Function**: Analyzes user message against `flow_keywords` to identify clear topic matches
+- **Behavior**: 
+  - If topic is clearly identified → Skip to `[VERIFY]` and proceed directly to Interview
+  - If topic is ambiguous → Continue to `[QUESTION]` for topic presentation
+- **Benefit**: Eliminates unnecessary topic enumeration when user intent is clear
+
+#### **Interview Agent `[ANALYZE]`**
+- **Purpose**: Identify what information is still needed for complete understanding
+- **Function**: Analyzes available information and determines missing data requirements
+- **Behavior**: Guides the agent to ask only necessary questions
+- **Benefit**: More efficient interviews with focused questioning
+
+#### **Answer Agent `[ANALYZE]`**
+- **Purpose**: Analyze available information and identify response requirements
+- **Function**: Deep analysis of collected data to determine appropriate response structure
+- **Behavior**: Ensures comprehensive and accurate responses
+- **Benefit**: Higher quality answers with better information utilization
+
+#### **Knowledge Agent `[ROLLBACK]`**
+- **Purpose**: Handle cases where information is not found in documents
+- **Function**: Provides graceful fallback when RAG cannot find relevant information
+- **Behavior**: Suggests contacting triage agent for alternative assistance
+- **Benefit**: Better user experience with clear guidance when information is unavailable
 
 ### Configuration Integration
 
