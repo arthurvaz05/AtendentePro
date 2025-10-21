@@ -44,10 +44,10 @@ except ImportError:  # pragma: no cover - fallback when executed as script
 
 if __package__:
     from ..context import ContextNote  # type: ignore
-    from .knowledge_prompts import knowledge_prompts_agent  # type: ignore
+    from .knowledge_prompts import prompts_knowledge_agent  # type: ignore
 else:  # pragma: no cover - running as a standalone script
     from context import ContextNote  # type: ignore
-    from knowledge_prompts import knowledge_prompts_agent  # type: ignore
+    from knowledge_prompts import prompts_knowledge_agent  # type: ignore
 
 
 @function_tool
@@ -204,7 +204,7 @@ knowledge_agent = Agent[ContextNote](  # type: ignore[name-defined]
     handoff_description="Um agente de conhecimento que pode responder a perguntas do usuário.",
     instructions=(
         f"{config.RECOMMENDED_PROMPT_PREFIX} "
-        f"{knowledge_prompts_agent}"
+        f"{prompts_knowledge_agent}"
     ),
     tools=[go_to_rag],
 )

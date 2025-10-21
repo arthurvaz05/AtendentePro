@@ -11,14 +11,15 @@ from AtendentePro.context import ContextNote
 flow_agent = Agent[ContextNote](
     name="Flow Agent",
     handoff_description=f"""
-    Um agente de fluxo que faz uma pergunta ao usuário para obter informações relevantes e transferir a conversa indicando qual tópico deve ser entrevistado.
-    Só deve trasnferir para o triage se a resposta do usuário não for clara o suficiente para determinar o tópico deve ser entrevistado.
-    Caso tenha uma rota clara, deve transferir para o agente de entrevista com o tópico escolhido.
+    Um agente de fluxo inteligente que:
+    1. Se o usuário já especificou um tópico específico, vai direto para o interview_agent
+    2. Se não especificou, apresenta a lista de tópicos para o usuário escolher
+    3. Só transfere para triage se a resposta não for clara o suficiente
     """,
     instructions=(
         f"{config.RECOMMENDED_PROMPT_PREFIX} "
         f"{flow_prompts_agent}"
     ),
     handoffs=[],
-    # output_type=FlowOutput,
+    output_type=FlowOutput,
 )
