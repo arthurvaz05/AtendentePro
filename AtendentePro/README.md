@@ -259,6 +259,57 @@ This architecture ensures consistent behavior while allowing client-specific cus
 
 ---
 
+## Input Guardrails
+
+AtendentePro includes a comprehensive input guardrail system that monitors and validates user inputs in real-time, providing security and ensuring appropriate usage.
+
+### Guardrail Functions
+
+#### 1. **Content Security** (`reject_sensitive_content`)
+- **Purpose**: Blocks sensitive words and suspicious patterns
+- **Protects Against**: Passwords, hacking attempts, malicious code
+- **Domain-Specific**: IVA fraud, energy manipulation, offensive language
+
+#### 2. **Topic Validation** (`reject_off_topic_queries`)
+- **Purpose**: Ensures queries stay within AtendentePro scope
+- **Blocks**: Cryptocurrency, politics, religion, sports, cooking
+- **Allows**: IVA codes, energy electricity, company services
+
+#### 3. **IVA Code Validation** (`validate_iva_codes`)
+- **Purpose**: Validates IVA codes mentioned in queries
+- **Validates**: Against predefined list of valid codes (01-30)
+- **Blocks**: Invalid or non-existent IVA codes
+
+#### 4. **Spam Detection** (`detect_spam_patterns`)
+- **Purpose**: Detects spam and repetitive patterns
+- **Blocks**: Excessive character repetition, very short messages
+- **Protects**: Against automated spam attacks
+
+### Agent-Specific Guardrails
+
+Each agent uses tailored guardrails based on its function:
+
+- **Triage Agent**: Topic validation + spam detection
+- **Flow Agent**: Topic validation + IVA code validation
+- **Interview Agent**: Content security + IVA code validation
+- **Answer Agent**: Content security + IVA code validation
+- **Confirmation Agent**: Content security
+- **Knowledge Agent**: Topic validation + spam detection
+- **Usage Agent**: Spam detection
+
+### Usage
+
+Guardrails run automatically in parallel with agent execution. No additional configuration needed - they're integrated into each agent definition.
+
+### Testing Guardrails
+
+Run the test example to see guardrails in action:
+```bash
+python AtendentePro/examples/test_guardrails.py
+```
+
+---
+
 ## Tests
 
 Run the full suite (agent wiring + helpers):
