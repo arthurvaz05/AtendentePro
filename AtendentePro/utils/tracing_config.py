@@ -107,9 +107,14 @@ def _convert_item(instrumentation_key: str, item: "Trace | Span[Any]") -> dict[s
             "workflow_name": payload.get("workflow_name"),
             "group_id": payload.get("group_id"),
             "metadata": _stringify(payload.get("metadata")),
+            "event.name": "agents.trace",
         }
         message = f"Trace {payload.get('id')} - {payload.get('workflow_name')}"
-        return _build_envelope(instrumentation_key, time, message, properties)
+        tags = {
+            "ai.operation.id": payload.get("id"),
+            "ai.operation.name": payload.get("workflow_name") or "",
+        }
+        return _build_envelope(instrumentation_key, time, message, properties, tags)
 
     if isinstance(item, Span):
         payload = item.export()
@@ -119,18 +124,35 @@ def _convert_item(instrumentation_key: str, item: "Trace | Span[Any]") -> dict[s
         started_at = payload.get("started_at")
         ended_at = payload.get("ended_at")
         time = ended_at or started_at or _iso_now()
+        span_type = data.get("type") if isinstance(data, dict) else None
+
+        event_name = "agents.span"
+        if span_type == "generation":
+            event_name = "gen_ai.choice"
+        elif span_type == "agent":
+            event_name = "gen_ai.agent"
+        elif span_type == "response":
+            event_name = "gen_ai.assistant.message"
+
         properties = {
             "trace_id": payload.get("trace_id"),
             "span_id": payload.get("id"),
             "parent_id": payload.get("parent_id"),
-            "span_type": data.get("type") if isinstance(data, dict) else None,
+            "span_type": span_type,
             "span_payload": _stringify(data),
             "error": _stringify(payload.get("error")),
             "started_at": started_at,
             "ended_at": ended_at,
+            "event.name": event_name,
+            "gen_ai.provider.name": getattr(config, "OPENAI_PROVIDER", "azure"),
+            "gen_ai.event.content": _stringify(data),
         }
-        message = f"Span {payload.get('id')} ({data.get('type') if isinstance(data, dict) else 'span'})"
-        return _build_envelope(instrumentation_key, time, message, properties)
+        message = f"Span {payload.get('id')} ({span_type or 'span'})"
+        tags = {
+            "ai.operation.id": payload.get("trace_id"),
+            "ai.operation.parentId": payload.get("parent_id") or payload.get("trace_id"),
+        }
+        return _build_envelope(instrumentation_key, time, message, properties, tags)
 
     return None
 
@@ -140,9 +162,10 @@ def _build_envelope(
     time_iso: str,
     message: str,
     properties: dict[str, Any],
+    tags: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     filtered_props = {k: _stringify(v) for k, v in properties.items() if v not in (None, "")}
-    return {
+    envelope = {
         "name": "Microsoft.ApplicationInsights.Message",
         "time": time_iso,
         "iKey": instrumentation_key,
@@ -155,6 +178,9 @@ def _build_envelope(
             },
         },
     }
+    if tags:
+        envelope["tags"] = {k: v for k, v in tags.items() if v}
+    return envelope
 
 
 def _iso_now() -> str:
