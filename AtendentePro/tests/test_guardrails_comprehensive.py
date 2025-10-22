@@ -38,14 +38,25 @@ class TestGuardrailConfig:
                     "codes": ["F0", "F1", "F5", "FE", "FA", "F2", "FC", "F7", "F3", "FD", "FB", "F4"]
                 }
             },
-            "off_topic_keywords": [
-                "bitcoin", "criptomoeda", "investimento", "ações", "bolsa",
-                "política", "eleição", "governo", "presidente", "deputado",
-                "religião", "deus", "jesus", "igreja", "bíblia",
-                "futebol", "esporte", "jogo", "filme", "música",
-                "receita", "cocina", "comida", "bolo", "pizza",
-                "brasil", "descobriu", "história", "geografia", "país",
-                "temperatura", "clima", "tempo", "chuva", "sol"
+            "on_topic_keywords": [
+                "iva", "código", "códigos", "tributário", "tributação", "imposto", "impostos",
+                "fiscal", "fiscalização", "nota fiscal", "nf", "nfe", "nfce", "icms", "ipi",
+                "pis", "cofins", "simples nacional", "microempresa", "substituição tributária",
+                "compra", "compras", "industrialização", "industrial", "produção", "manufaturado",
+                "comercialização", "comercial", "revenda", "ativo operacional", "ativo projeto",
+                "máquina", "equipamento", "cilindro", "consumo administrativo", "administrativo",
+                "escritório", "limpeza", "ti", "frete", "transporte", "logística",
+                "energia elétrica", "energia", "elétrica", "eletricidade", "serviço operação",
+                "serviço não operação", "manutenção", "assistência", "engenharia", "consultoria",
+                "auditoria", "inspeção", "fornecedor", "fornecedores", "cliente", "clientes",
+                "empresa", "empresas", "cnpj", "cpf", "pessoa física", "pessoa jurídica",
+                "processo", "procedimento", "documentação", "documento", "documentos",
+                "análise", "análises", "consulta", "consultas", "orientação", "orientações",
+                "suporte", "atendimento", "assistência", "ajuda", "white martins", "white",
+                "martins", "gás", "gases", "oxigênio", "nitrogênio", "argônio", "hidrogênio",
+                "hélio", "acetileno", "co2", "dióxido de carbono", "soldagem", "corte",
+                "laboratório", "hospitalar", "alimentício", "bebida", "refrigeração",
+                "ar condicionado", "caldeira", "forno", "queima", "combustão"
             ],
             "sensitive_words": [
                 "password", "senha", "token", "key", "secret",
@@ -57,8 +68,8 @@ class TestGuardrailConfig:
     def get_topics(self):
         return self.config.get("topics", {})
     
-    def get_off_topic_keywords(self):
-        return self.config.get("off_topic_keywords", [])
+    def get_on_topic_keywords(self):
+        return self.config.get("on_topic_keywords", [])
     
     def get_sensitive_words(self):
         return self.config.get("sensitive_words", [])
@@ -67,25 +78,37 @@ class TestGuardrailConfig:
 test_config = TestGuardrailConfig()
 
 def reject_off_topic_queries(data):
-    """Rejeita consultas fora do escopo"""
+    """Rejeita consultas fora do escopo usando nova lógica on_topic_keywords"""
     try:
         args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
     except json.JSONDecodeError:
         return Mock(output_info="Argumentos JSON inválidos")
 
-    off_topic_keywords = test_config.get_off_topic_keywords()
+    on_topic_keywords = test_config.get_on_topic_keywords()
 
+    # Se não há palavras-chave permitidas configuradas, não validar
+    if not on_topic_keywords:
+        return Mock(output_info="Validação de tópicos não configurada")
+
+    # Verificar se a consulta contém pelo menos uma palavra-chave permitida
     for key, value in args.items():
         value_str = str(value).lower()
         
-        for keyword in off_topic_keywords:
+        # Verificar se pelo menos uma palavra-chave permitida está presente
+        topic_found = False
+        for keyword in on_topic_keywords:
             if keyword.lower() in value_str:
-                return Mock(
-                    output_info=None,
-                    message=f"🚨 Consulta fora do escopo: '{keyword}' não é relacionado aos serviços da empresa"
-                )
+                topic_found = True
+                break
+        
+        # Se nenhuma palavra-chave permitida foi encontrada, rejeitar
+        if not topic_found:
+            return Mock(
+                output_info=None,
+                message=f"🚨 Consulta fora do escopo: não foi identificado nenhum tópico relacionado aos serviços da empresa"
+            )
 
-    return Mock(output_info="Consulta dentro do escopo válido")
+    return Mock(output_info="Consulta dentro do escopo")
 
 def validate_topic_and_codes(data):
     """Valida tópicos e códigos específicos por tópico"""

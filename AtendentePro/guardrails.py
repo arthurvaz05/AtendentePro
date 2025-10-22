@@ -66,8 +66,12 @@ class GuardrailConfig:
         return self.config.get("sensitive_words", [])
     
     def get_off_topic_keywords(self) -> List[str]:
-        """Retorna lista de palavras fora do escopo"""
+        """Retorna lista de palavras fora do escopo (DEPRECATED - usar get_on_topic_keywords)"""
         return self.config.get("off_topic_keywords", [])
+    
+    def get_on_topic_keywords(self) -> List[str]:
+        """Retorna lista de palavras-chave permitidas (nova lógica)"""
+        return self.config.get("on_topic_keywords", [])
     
     def get_suspicious_patterns(self) -> List[str]:
         """Retorna lista de padrões suspeitos"""
@@ -165,25 +169,36 @@ def reject_off_topic_queries(data: ToolInputGuardrailData) -> ToolGuardrailFunct
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
 
-    off_topic_keywords = guardrail_config.get_off_topic_keywords()
+    on_topic_keywords = guardrail_config.get_on_topic_keywords()
 
-    # Verificar tópicos fora do escopo
+    # Se não há palavras-chave permitidas configuradas, não validar
+    if not on_topic_keywords:
+        return ToolGuardrailFunctionOutput(output_info="Validação de tópicos não configurada")
+
+    # Verificar se a consulta contém pelo menos uma palavra-chave permitida
     for key, value in args.items():
         value_str = str(value).lower()
         
-        for keyword in off_topic_keywords:
+        # Verificar se pelo menos uma palavra-chave permitida está presente
+        topic_found = False
+        for keyword in on_topic_keywords:
             if keyword.lower() in value_str:
-                return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Consulta fora do escopo: '{keyword}' não é relacionado aos serviços da empresa",
-                    output_info={
-                        "off_topic_keyword": keyword,
-                        "argument": key,
-                        "reason": "fora_do_escopo",
-                        "suggestion": "Por favor, faça perguntas relacionadas aos serviços da empresa."
-                    },
-                )
+                topic_found = True
+                break
+        
+        # Se nenhuma palavra-chave permitida foi encontrada, rejeitar
+        if not topic_found:
+            return ToolGuardrailFunctionOutput.reject_content(
+                message=f"🚨 Consulta fora do escopo: não foi identificado nenhum tópico relacionado aos serviços da empresa",
+                output_info={
+                    "argument": key,
+                    "reason": "fora_do_escopo",
+                    "suggestion": "Por favor, faça perguntas relacionadas aos serviços da empresa.",
+                    "sample_topics": on_topic_keywords[:10]  # Mostrar alguns exemplos de tópicos permitidos
+                },
+            )
 
-    return ToolGuardrailFunctionOutput(output_info="Consulta dentro do escopo válido")
+    return ToolGuardrailFunctionOutput(output_info="Consulta dentro do escopo")
 
 
 @tool_input_guardrail

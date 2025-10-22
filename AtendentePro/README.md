@@ -287,8 +287,14 @@ AtendentePro/
 
 #### 2. **Topic Validation** (`reject_off_topic_queries`)
 - **Purpose**: Ensures queries stay within business scope
-- **Configuration**: Loads off-topic keywords from client YAML
-- **Blocks**: Cryptocurrency, politics, religion, sports, cooking, etc.
+- **Configuration**: Loads **on_topic_keywords** from client YAML (NEW APPROACH)
+- **Logic**: **Permits queries that contain at least one allowed keyword** (instead of blocking forbidden ones)
+- **Benefits**: 
+  - ✅ **Easier to maintain**: Define what's allowed rather than what's forbidden
+  - ✅ **More comprehensive**: Covers all business domains without exhaustive exclusion lists
+  - ✅ **Client-specific**: Each client defines their own allowed topics
+- **Example**: "Qual o código IVA para energia elétrica?" → ✅ **Allowed** (contains "iva", "código", "energia elétrica")
+- **Example**: "Quem descobriu o Brasil?" → ❌ **Blocked** (no allowed keywords found)
 
 #### 3. **Business Code Validation** (`validate_business_codes`)
 - **Purpose**: Validates business-specific codes (IVA, product codes, etc.)
@@ -348,11 +354,16 @@ sensitive_words:
   - "hack"
   - "fraud"
 
-# Off-topic keywords
-off_topic_keywords:
-  - "bitcoin"
-  - "politics"
-  - "weather"
+# On-topic keywords (NEW APPROACH - define what's allowed)
+on_topic_keywords:
+  - "iva"
+  - "código"
+  - "tributário"
+  - "energia elétrica"
+  - "compra"
+  - "industrialização"
+  - "comercialização"
+  # ... etc (much easier to maintain!)
 
 # Business topics with codes
 topics:
