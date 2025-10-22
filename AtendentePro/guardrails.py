@@ -66,8 +66,12 @@ class GuardrailConfig:
         return self.config.get("sensitive_words", [])
     
     def get_off_topic_keywords(self) -> List[str]:
-        """Retorna lista de palavras fora do escopo"""
+        """Retorna lista de palavras fora do escopo (DEPRECATED - usar get_on_topic_keywords)"""
         return self.config.get("off_topic_keywords", [])
+    
+    def get_on_topic_keywords(self) -> List[str]:
+        """Retorna lista de palavras-chave permitidas (nova lógica)"""
+        return self.config.get("on_topic_keywords", [])
     
     def get_suspicious_patterns(self) -> List[str]:
         """Retorna lista de padrões suspeitos"""
@@ -130,25 +134,15 @@ def reject_sensitive_content(data: ToolInputGuardrailData) -> ToolGuardrailFunct
         # Verificar palavras sensíveis
         for word in sensitive_words:
             if word.lower() in value_str:
-                return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Chamada de ferramenta bloqueada: contém '{word}'",
-                    output_info={
-                        "blocked_word": word,
-                        "argument": key,
-                        "reason": "conteudo_sensivel"
-                    },
+                return ToolGuardrailFunctionOutput(
+                    output_info=f"Desculpe, mas não posso processar sua solicitação pois contém conteúdo sensível relacionado a '{word}'. Por favor, reformule sua pergunta de forma mais adequada."
                 )
         
         # Verificar padrões suspeitos
         for pattern in suspicious_patterns:
             if re.search(pattern, value_str, re.IGNORECASE):
-                return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Chamada de ferramenta bloqueada: padrão suspeito detectado",
-                    output_info={
-                        "blocked_pattern": pattern,
-                        "argument": key,
-                        "reason": "padrao_suspeito"
-                    },
+                return ToolGuardrailFunctionOutput(
+                    output_info="Desculpe, mas não posso processar sua solicitação pois detectei um padrão suspeito. Por favor, reformule sua pergunta de forma mais adequada."
                 )
 
     return ToolGuardrailFunctionOutput(output_info="Entrada validada com sucesso")
@@ -165,25 +159,96 @@ def reject_off_topic_queries(data: ToolInputGuardrailData) -> ToolGuardrailFunct
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
 
-    off_topic_keywords = guardrail_config.get_off_topic_keywords()
+    on_topic_keywords = guardrail_config.get_on_topic_keywords()
 
-    # Verificar tópicos fora do escopo
+    # Se não há palavras-chave permitidas configuradas, não validar
+    if not on_topic_keywords:
+        return ToolGuardrailFunctionOutput(output_info="Validação de tópicos não configurada")
+
+    # Verificar se a consulta contém pelo menos uma palavra-chave permitida
     for key, value in args.items():
         value_str = str(value).lower()
         
-        for keyword in off_topic_keywords:
+        # Verificar se pelo menos uma palavra-chave permitida está presente
+        topic_found = False
+        for keyword in on_topic_keywords:
             if keyword.lower() in value_str:
-                return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Consulta fora do escopo: '{keyword}' não é relacionado aos serviços da empresa",
-                    output_info={
-                        "off_topic_keyword": keyword,
-                        "argument": key,
-                        "reason": "fora_do_escopo",
-                        "suggestion": "Por favor, faça perguntas relacionadas aos serviços da empresa."
-                    },
+                topic_found = True
+                break
+        
+        # Se nenhuma palavra-chave permitida foi encontrada, retornar mensagem educativa
+        if not topic_found:
+            sample_topics = ", ".join(on_topic_keywords[:5])  # Mostrar alguns exemplos
+            return ToolGuardrailFunctionOutput(
+                output_info=f"Desculpe, mas não posso responder sobre esse tema. Meu foco é ajudar com questões relacionadas aos serviços da empresa, como: {sample_topics}. Por favor, reformule sua pergunta sobre um desses tópicos."
+            )
+
+    return ToolGuardrailFunctionOutput(output_info="Consulta dentro do escopo")
+
+
+def reject_off_topic_queries_factory(agent_name: str):
+    """
+    Factory function que cria uma função de guardrail específica para cada agente.
+    Cada agente tem seus próprios on_topic_keywords baseados em seus prompts.
+    """
+    @tool_input_guardrail
+    def reject_off_topic_queries(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
+        """
+        Rejeita consultas fora do escopo específico do agente.
+        Escopo definido dinamicamente pelos prompts e configurações do agente.
+        """
+        try:
+            args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
+        except json.JSONDecodeError:
+            return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
+
+        # Carregar temas específicos do agente
+        on_topic_keywords = get_agent_on_topic_keywords(agent_name)
+
+        # Se não há palavras-chave permitidas configuradas, não validar
+        if not on_topic_keywords:
+            return ToolGuardrailFunctionOutput(output_info=f"Validação de tópicos não configurada para {agent_name}")
+
+        # Verificar se a consulta contém pelo menos uma palavra-chave permitida
+        for key, value in args.items():
+            value_str = str(value).lower()
+            
+            # Verificar se pelo menos uma palavra-chave permitida está presente
+            topic_found = False
+            for keyword in on_topic_keywords:
+                if keyword.lower() in value_str:
+                    topic_found = True
+                    break
+            
+            # Se nenhuma palavra-chave permitida foi encontrada, retornar mensagem educativa específica do agente
+            if not topic_found:
+                sample_topics = ", ".join(on_topic_keywords[:5])  # Mostrar alguns exemplos
+                agent_friendly_name = agent_name.replace(" Agent", "").lower()
+                return ToolGuardrailFunctionOutput(
+                    output_info=f"Desculpe, mas o {agent_friendly_name} não pode responder sobre esse tema. Meu foco é ajudar com questões relacionadas a: {sample_topics}. Por favor, reformule sua pergunta sobre um desses tópicos."
                 )
 
-    return ToolGuardrailFunctionOutput(output_info="Consulta dentro do escopo válido")
+        return ToolGuardrailFunctionOutput(output_info=f"Consulta dentro do escopo do {agent_name}")
+    
+    return reject_off_topic_queries
+
+
+def get_agent_on_topic_keywords(agent_name: str) -> List[str]:
+    """
+    Retorna os on_topic_keywords específicos para um agente.
+    Carrega da configuração agent_guardrails_config.yaml.
+    """
+    try:
+        client_config_file = guardrail_config.client_path / "agent_guardrails_config.yaml"
+        if client_config_file.exists():
+            with open(client_config_file, 'r', encoding='utf-8') as f:
+                client_config = yaml.safe_load(f)
+                agent_config = client_config.get(agent_name, {})
+                return agent_config.get("on_topic_keywords", [])
+    except Exception:
+        pass  # Retornar lista vazia se houver erro
+    
+    return []
 
 
 @tool_input_guardrail
@@ -216,14 +281,8 @@ def validate_business_codes(data: ToolInputGuardrailData) -> ToolGuardrailFuncti
         
         for match in matches:
             if match not in valid_codes:
-                return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Código IVA inválido: '{match}' não é um código válido",
-                    output_info={
-                        "invalid_code": match,
-                        "argument": key,
-                        "reason": "codigo_iva_invalido",
-                        "valid_codes_sample": valid_codes[:10]  # Mostrar apenas alguns exemplos
-                    },
+                return ToolGuardrailFunctionOutput(
+                    output_info=f"Desculpe, mas o código '{match}' não é um código IVA válido. Por favor, verifique o código e tente novamente. Se precisar de ajuda com códigos válidos, posso orientá-lo sobre os códigos disponíveis."
                 )
 
     return ToolGuardrailFunctionOutput(output_info="Códigos IVA validados")
@@ -268,14 +327,8 @@ def validate_topic_and_codes(data: ToolInputGuardrailData) -> ToolGuardrailFunct
                         break
                 
                 if not code_found_in_topic:
-                    return ToolGuardrailFunctionOutput.reject_content(
-                        message=f"🚨 Código IVA '{code}' não encontrado em nenhum tópico válido",
-                        output_info={
-                            "invalid_code": code,
-                            "argument": key,
-                            "reason": "codigo_nao_encontrado_em_topicos",
-                            "available_topics": list(topics.keys())
-                        },
+                    return ToolGuardrailFunctionOutput(
+                        output_info=f"Desculpe, mas o código '{code}' não é um código IVA válido para nenhum tópico. Por favor, verifique o código e tente novamente. Se precisar de ajuda com códigos válidos, posso orientá-lo sobre os códigos disponíveis."
                     )
                 
                 # Verificar se o contexto da pergunta corresponde ao tópico do código
@@ -303,15 +356,8 @@ def validate_topic_and_codes(data: ToolInputGuardrailData) -> ToolGuardrailFunct
                             break
                 
                 if not context_matches:
-                    return ToolGuardrailFunctionOutput.reject_content(
-                        message=f"🚨 Código IVA '{code}' não corresponde ao contexto da pergunta. Este código é para: {topic_description}",
-                        output_info={
-                            "code": code,
-                            "expected_topic": topic_for_code,
-                            "topic_description": topic_description,
-                            "argument": key,
-                            "reason": "codigo_contexto_incompativel"
-                        },
+                    return ToolGuardrailFunctionOutput(
+                        output_info=f"Desculpe, mas o código '{code}' não corresponde ao contexto da sua pergunta. Este código é específico para: {topic_description}. Por favor, verifique se está usando o código correto para o contexto da sua pergunta."
                     )
 
     return ToolGuardrailFunctionOutput(output_info="Tópicos e códigos validados")
@@ -337,24 +383,14 @@ def detect_spam_patterns(data: ToolInputGuardrailData) -> ToolGuardrailFunctionO
         # Detectar padrões de spam configurados
         for pattern in spam_patterns:
             if re.search(pattern, value_str):
-                return ToolGuardrailFunctionOutput.reject_content(
-                    message="🚨 Mensagem bloqueada: padrão de spam detectado",
-                    output_info={
-                        "argument": key,
-                        "reason": "padrao_spam",
-                        "detected_pattern": pattern
-                    },
+                return ToolGuardrailFunctionOutput(
+                    output_info="Desculpe, mas sua mensagem foi bloqueada por conter padrões de spam. Por favor, reformule sua pergunta de forma mais adequada e objetiva."
                 )
         
         # Detectar mensagens muito curtas
         if len(value_str.strip()) < min_length:
-            return ToolGuardrailFunctionOutput.reject_content(
-                message=f"🚨 Mensagem muito curta: forneça mais detalhes (mínimo {min_length} caracteres)",
-                output_info={
-                    "argument": key,
-                    "reason": "mensagem_muito_curta",
-                    "min_length": min_length
-                },
+            return ToolGuardrailFunctionOutput(
+                output_info=f"Desculpe, mas sua mensagem é muito curta. Por favor, forneça mais detalhes (mínimo {min_length} caracteres) para que eu possa ajudá-lo melhor."
             )
 
     return ToolGuardrailFunctionOutput(output_info="Padrões de spam verificados")
@@ -374,6 +410,7 @@ def get_guardrails_for_agent(agent_name: str) -> List:
     """
     Retorna os guardrails apropriados para cada agente.
     Configuração carregada dinamicamente do template do cliente.
+    Agora suporta guardrails específicos por agente com temas personalizados.
     """
     # Configuração padrão genérica
     default_guardrails_map = {
@@ -392,7 +429,30 @@ def get_guardrails_for_agent(agent_name: str) -> List:
         if client_config_file.exists():
             with open(client_config_file, 'r', encoding='utf-8') as f:
                 client_config = yaml.safe_load(f)
-                return client_config.get(agent_name, default_guardrails_map.get(agent_name, [reject_sensitive_content]))
+                agent_config = client_config.get(agent_name, {})
+                
+                # Se há configuração específica do agente, usar guardrails específicos
+                if agent_config and "guardrails" in agent_config:
+                    guardrail_names = agent_config.get("guardrails", [])
+                    guardrails = []
+                    
+                    for guardrail_name in guardrail_names:
+                        if guardrail_name == "reject_off_topic_queries":
+                            # Usar factory para criar guardrail específico do agente
+                            guardrails.append(reject_off_topic_queries_factory(agent_name))
+                        elif guardrail_name == "reject_sensitive_content":
+                            guardrails.append(reject_sensitive_content)
+                        elif guardrail_name == "validate_topic_and_codes":
+                            guardrails.append(validate_topic_and_codes)
+                        elif guardrail_name == "detect_spam_patterns":
+                            guardrails.append(detect_spam_patterns)
+                        elif guardrail_name == "validate_business_codes":
+                            guardrails.append(validate_business_codes)
+                    
+                    return guardrails
+                
+                # Fallback para configuração antiga (compatibilidade)
+                return agent_config.get("guardrails", default_guardrails_map.get(agent_name, [reject_sensitive_content]))
     except Exception:
         pass  # Usar configuração padrão se houver erro
     
