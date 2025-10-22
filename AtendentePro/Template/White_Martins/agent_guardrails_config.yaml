@@ -1,0 +1,59 @@
+# Configuração de Guardrails por Agente - White Martins
+# Define quais guardrails cada agente deve usar
+
+# Mapeamento de agentes para guardrails
+Triage Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
+
+Flow Agent:
+  - reject_off_topic_queries
+  - validate_business_codes
+
+Interview Agent:
+  - reject_sensitive_content
+  - validate_business_codes
+
+Answer Agent:
+  - reject_sensitive_content
+  - validate_business_codes
+
+Confirmation Agent:
+  - reject_sensitive_content
+
+Knowledge Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
+
+Usage Agent:
+  - detect_spam_patterns
+
+# Configurações adicionais por agente
+agent_specific_config:
+  Triage Agent:
+    description: "Agente de triagem - foca em escopo e spam"
+    priority: "scope_validation"
+  
+  Flow Agent:
+    description: "Agente de fluxo - valida códigos de negócio"
+    priority: "business_validation"
+  
+  Interview Agent:
+    description: "Agente de entrevista - protege conteúdo sensível"
+    priority: "content_security"
+  
+  Answer Agent:
+    description: "Agente de resposta - valida códigos finais"
+    priority: "final_validation"
+  
+  Confirmation Agent:
+    description: "Agente de confirmação - protege dados sensíveis"
+    priority: "data_protection"
+  
+  Knowledge Agent:
+    description: "Agente de conhecimento - mantém escopo focado"
+    priority: "scope_maintenance"
+  
+  Usage Agent:
+    description: "Agente de uso - previne spam"
+    priority: "spam_prevention"

@@ -1,0 +1,131 @@
+# Configuração de Guardrails para White Martins
+# Específico para domínio tributário e IVA
+
+# Palavras sensíveis específicas do domínio tributário
+sensitive_words:
+  # Segurança geral
+  - "password"
+  - "senha" 
+  - "token"
+  - "key"
+  - "secret"
+  - "hack"
+  - "exploit"
+  - "malware"
+  - "virus"
+  
+  # Domínio específico - Tributário/IVA
+  - "fraude"
+  - "sonegação"
+  - "evasão"
+  - "ilegal"
+  - "manipulação"
+  - "corrupção"
+  - "suborno"
+  - "lavagem"
+  - "contrabando"
+  
+  # Palavras ofensivas
+  - "idiota"
+  - "burro"
+  - "estúpido"
+  - "imbecil"
+  - "merda"
+  - "porra"
+  - "caralho"
+  - "foda"
+
+# Tópicos fora do escopo (não relacionados a tributário/IVA)
+off_topic_keywords:
+  # Criptomoedas e investimentos
+  - "bitcoin"
+  - "criptomoeda"
+  - "investimento"
+  - "ações"
+  - "bolsa"
+  
+  # Política e governo
+  - "política"
+  - "eleição"
+  - "governo"
+  - "presidente"
+  - "deputado"
+  
+  # Religião
+  - "religião"
+  - "deus"
+  - "jesus"
+  - "igreja"
+  - "bíblia"
+  
+  # Esportes e entretenimento
+  - "futebol"
+  - "esporte"
+  - "jogo"
+  - "filme"
+  - "música"
+  
+  # Culinária e receitas
+  - "receita"
+  - "cocina"
+  - "comida"
+  - "bolo"
+  - "pizza"
+  
+  # História e geografia
+  - "brasil"
+  - "descobriu"
+  - "história"
+  - "geografia"
+  - "país"
+
+# Padrões suspeitos de código malicioso
+suspicious_patterns:
+  - "delete\\s+.*"
+  - "drop\\s+.*"
+  - "exec\\s+.*"
+  - "eval\\s+.*"
+  - "system\\s+.*"
+  - "rm\\s+.*"
+  - "format\\s+.*"
+
+# Códigos IVA válidos (White Martins)
+valid_codes:
+  - "01"
+  - "02"
+  - "03"
+  - "04"
+  - "05"
+  - "06"
+  - "07"
+  - "08"
+  - "09"
+  - "10"
+  - "11"
+  - "12"
+  - "13"
+  - "14"
+  - "15"
+  - "16"
+  - "17"
+  - "18"
+  - "19"
+  - "20"
+  - "21"
+  - "22"
+  - "23"
+  - "24"
+  - "25"
+  - "26"
+  - "27"
+  - "28"
+  - "29"
+  - "30"
+
+# Configurações de spam
+min_message_length: 3
+
+spam_patterns:
+  - "(.)\\1{4,}"  # Repetição excessiva de caracteres
+  - "^[0-9]+$"    # Apenas números
+  - "^[a-zA-Z]{1}$"  # Apenas uma letra

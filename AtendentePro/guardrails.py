@@ -1,68 +1,115 @@
 #!/usr/bin/env python3
 """
-Input Guardrails para AtendentePro
-Sistema de segurança que monitora entradas em tempo real
+Input Guardrails Genérico para AtendentePro
+Sistema de segurança reutilizável que carrega configurações específicas do cliente
 """
 
 import json
 import re
+import yaml
 from typing import Dict, List, Any
+from pathlib import Path
 from agents import (
     ToolInputGuardrailData,
     ToolGuardrailFunctionOutput,
     tool_input_guardrail,
 )
 
-# Palavras sensíveis específicas do domínio AtendentePro
-SENSITIVE_WORDS = [
-    # Segurança
-    "password", "senha", "token", "key", "secret",
-    "hack", "exploit", "malware", "virus",
-    
-    # Domínio específico - IVA/Energia
-    "fraude", "sonegação", "evasão", "ilegal",
-    "manipulação", "corrupção", "suborno",
-    
-    # Palavras ofensivas
-    "idiota", "burro", "estúpido", "imbecil",
-    "merda", "porra", "caralho", "foda",
-]
 
-# Padrões suspeitos
-SUSPICIOUS_PATTERNS = [
-    r"delete\s+.*",  # Comandos de exclusão
-    r"drop\s+.*",    # Comandos SQL perigosos
-    r"exec\s+.*",    # Execução de código
-    r"eval\s+.*",    # Avaliação de código
-    r"system\s+.*",  # Chamadas de sistema
-]
+class GuardrailConfig:
+    """Carrega configurações de guardrails do template do cliente"""
+    
+    def __init__(self, client_template_path: str = "Template/White_Martins"):
+        self.client_path = Path(__file__).parent / client_template_path
+        self.config = self._load_config()
+    
+    def _load_config(self) -> Dict[str, Any]:
+        """Carrega configurações do arquivo guardrails_config.yaml"""
+        config_file = self.client_path / "guardrails_config.yaml"
+        
+        if not config_file.exists():
+            # Configuração padrão se arquivo não existir
+            return self._get_default_config()
+        
+        with open(config_file, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    
+    def _get_default_config(self) -> Dict[str, Any]:
+        """Configuração padrão genérica"""
+        return {
+            "sensitive_words": [
+                "password", "senha", "token", "key", "secret",
+                "hack", "exploit", "malware", "virus",
+            ],
+            "off_topic_keywords": [
+                "bitcoin", "criptomoeda", "investimento",
+                "política", "eleição", "governo",
+                "religião", "deus", "jesus",
+                "futebol", "esporte", "jogo",
+            ],
+            "suspicious_patterns": [
+                r"delete\s+.*",
+                r"drop\s+.*", 
+                r"exec\s+.*",
+                r"eval\s+.*",
+                r"system\s+.*",
+            ],
+            "valid_codes": [],
+            "min_message_length": 3,
+            "spam_patterns": [
+                r'(.)\1{4,}',  # Repetição excessiva
+            ]
+        }
+    
+    def get_sensitive_words(self) -> List[str]:
+        """Retorna lista de palavras sensíveis"""
+        return self.config.get("sensitive_words", [])
+    
+    def get_off_topic_keywords(self) -> List[str]:
+        """Retorna lista de palavras fora do escopo"""
+        return self.config.get("off_topic_keywords", [])
+    
+    def get_suspicious_patterns(self) -> List[str]:
+        """Retorna lista de padrões suspeitos"""
+        return self.config.get("suspicious_patterns", [])
+    
+    def get_valid_codes(self) -> List[str]:
+        """Retorna lista de códigos válidos"""
+        return self.config.get("valid_codes", [])
+    
+    def get_min_message_length(self) -> int:
+        """Retorna tamanho mínimo de mensagem"""
+        return self.config.get("min_message_length", 3)
+    
+    def get_spam_patterns(self) -> List[str]:
+        """Retorna lista de padrões de spam"""
+        return self.config.get("spam_patterns", [])
 
-# Tópicos fora do escopo
-OFF_TOPIC_KEYWORDS = [
-    "bitcoin", "criptomoeda", "investimento",
-    "política", "eleição", "governo",
-    "religião", "deus", "jesus",
-    "futebol", "esporte", "jogo",
-    "receita", "cocina", "comida",
-]
+
+# Instância global da configuração
+guardrail_config = GuardrailConfig()
+
 
 @tool_input_guardrail
 def reject_sensitive_content(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
     """
     Rejeita chamadas de ferramenta que contenham conteúdo sensível.
-    Específico para o domínio AtendentePro (IVA, energia elétrica).
+    Configurações carregadas dinamicamente do template do cliente.
     """
     try:
         args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
 
+    sensitive_words = guardrail_config.get_sensitive_words()
+    suspicious_patterns = guardrail_config.get_suspicious_patterns()
+
     # Verificar palavras sensíveis
     for key, value in args.items():
         value_str = str(value).lower()
         
         # Verificar palavras sensíveis
-        for word in SENSITIVE_WORDS:
+        for word in sensitive_words:
             if word.lower() in value_str:
                 return ToolGuardrailFunctionOutput.reject_content(
                     message=f"🚨 Chamada de ferramenta bloqueada: contém '{word}'",
@@ -74,7 +121,7 @@ def reject_sensitive_content(data: ToolInputGuardrailData) -> ToolGuardrailFunct
                 )
         
         # Verificar padrões suspeitos
-        for pattern in SUSPICIOUS_PATTERNS:
+        for pattern in suspicious_patterns:
             if re.search(pattern, value_str, re.IGNORECASE):
                 return ToolGuardrailFunctionOutput.reject_content(
                     message=f"🚨 Chamada de ferramenta bloqueada: padrão suspeito detectado",
@@ -87,136 +134,167 @@ def reject_sensitive_content(data: ToolInputGuardrailData) -> ToolGuardrailFunct
 
     return ToolGuardrailFunctionOutput(output_info="Entrada validada com sucesso")
 
+
 @tool_input_guardrail
 def reject_off_topic_queries(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
     """
-    Rejeita consultas fora do escopo do AtendentePro.
-    Foca em IVA, energia elétrica e temas relacionados.
+    Rejeita consultas fora do escopo da aplicação.
+    Escopo definido dinamicamente pelo template do cliente.
     """
     try:
         args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
+
+    off_topic_keywords = guardrail_config.get_off_topic_keywords()
 
     # Verificar tópicos fora do escopo
     for key, value in args.items():
         value_str = str(value).lower()
         
-        for keyword in OFF_TOPIC_KEYWORDS:
+        for keyword in off_topic_keywords:
             if keyword.lower() in value_str:
                 return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Consulta fora do escopo: '{keyword}' não é relacionado a IVA/energia",
+                    message=f"🚨 Consulta fora do escopo: '{keyword}' não é relacionado aos serviços da empresa",
                     output_info={
                         "off_topic_keyword": keyword,
                         "argument": key,
                         "reason": "fora_do_escopo",
-                        "suggestion": "Por favor, faça perguntas relacionadas a IVA, energia elétrica ou serviços da empresa."
+                        "suggestion": "Por favor, faça perguntas relacionadas aos serviços da empresa."
                     },
                 )
 
     return ToolGuardrailFunctionOutput(output_info="Consulta dentro do escopo válido")
 
+
 @tool_input_guardrail
-def validate_iva_codes(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
+def validate_business_codes(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
     """
-    Valida códigos IVA mencionados nas consultas.
-    Verifica se são códigos válidos do sistema.
+    Valida códigos específicos do negócio mencionados nas consultas.
+    Códigos válidos definidos dinamicamente pelo template do cliente.
     """
     try:
         args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
 
-    # Códigos IVA válidos (exemplo - ajustar conforme necessário)
-    VALID_IVA_CODES = [
-        "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
-        "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
-        "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
-    ]
+    valid_codes = guardrail_config.get_valid_codes()
+    
+    # Se não há códigos configurados, não validar
+    if not valid_codes:
+        return ToolGuardrailFunctionOutput(output_info="Validação de códigos não configurada")
 
     for key, value in args.items():
         value_str = str(value)
         
-        # Procurar por códigos IVA no texto
-        iva_pattern = r'\b(\d{2})\b'
-        matches = re.findall(iva_pattern, value_str)
+        # Procurar por códigos no texto (padrão genérico)
+        code_pattern = r'\b(\d{2,})\b'  # Códigos de 2 ou mais dígitos
+        matches = re.findall(code_pattern, value_str)
         
         for match in matches:
-            if match not in VALID_IVA_CODES:
+            if match not in valid_codes:
                 return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Código IVA inválido: '{match}' não é um código válido",
+                    message=f"🚨 Código inválido: '{match}' não é um código válido",
                     output_info={
                         "invalid_code": match,
                         "argument": key,
-                        "reason": "codigo_iva_invalido",
-                        "valid_codes": VALID_IVA_CODES[:10]  # Mostrar apenas alguns exemplos
+                        "reason": "codigo_invalido",
+                        "valid_codes": valid_codes[:10]  # Mostrar apenas alguns exemplos
                     },
                 )
 
-    return ToolGuardrailFunctionOutput(output_info="Códigos IVA validados")
+    return ToolGuardrailFunctionOutput(output_info="Códigos validados")
+
 
 @tool_input_guardrail
 def detect_spam_patterns(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
     """
     Detecta padrões de spam ou mensagens repetitivas.
+    Padrões configuráveis pelo template do cliente.
     """
     try:
         args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
 
+    spam_patterns = guardrail_config.get_spam_patterns()
+    min_length = guardrail_config.get_min_message_length()
+
     for key, value in args.items():
         value_str = str(value)
         
-        # Detectar repetição excessiva de caracteres
-        if re.search(r'(.)\1{4,}', value_str):
-            return ToolGuardrailFunctionOutput.reject_content(
-                message="🚨 Mensagem bloqueada: padrão de spam detectado",
-                output_info={
-                    "argument": key,
-                    "reason": "padrao_spam",
-                    "detected_pattern": "repeticao_excessiva"
-                },
-            )
+        # Detectar padrões de spam configurados
+        for pattern in spam_patterns:
+            if re.search(pattern, value_str):
+                return ToolGuardrailFunctionOutput.reject_content(
+                    message="🚨 Mensagem bloqueada: padrão de spam detectado",
+                    output_info={
+                        "argument": key,
+                        "reason": "padrao_spam",
+                        "detected_pattern": pattern
+                    },
+                )
         
-        # Detectar mensagens muito curtas (possível spam)
-        if len(value_str.strip()) < 3:
+        # Detectar mensagens muito curtas
+        if len(value_str.strip()) < min_length:
             return ToolGuardrailFunctionOutput.reject_content(
-                message="🚨 Mensagem muito curta: forneça mais detalhes",
+                message=f"🚨 Mensagem muito curta: forneça mais detalhes (mínimo {min_length} caracteres)",
                 output_info={
                     "argument": key,
                     "reason": "mensagem_muito_curta",
-                    "min_length": 3
+                    "min_length": min_length
                 },
             )
 
     return ToolGuardrailFunctionOutput(output_info="Padrões de spam verificados")
 
+
 # Lista de todos os guardrails disponíveis
 AVAILABLE_GUARDRAILS = [
     reject_sensitive_content,
     reject_off_topic_queries,
-    validate_iva_codes,
+    validate_business_codes,
     detect_spam_patterns,
 ]
+
 
 def get_guardrails_for_agent(agent_name: str) -> List:
     """
     Retorna os guardrails apropriados para cada agente.
+    Configuração carregada dinamicamente do template do cliente.
     """
-    guardrails_map = {
+    # Configuração padrão genérica
+    default_guardrails_map = {
         "Triage Agent": [reject_off_topic_queries, detect_spam_patterns],
-        "Flow Agent": [reject_off_topic_queries, validate_iva_codes],
-        "Interview Agent": [reject_sensitive_content, validate_iva_codes],
-        "Answer Agent": [reject_sensitive_content, validate_iva_codes],
+        "Flow Agent": [reject_off_topic_queries, validate_business_codes],
+        "Interview Agent": [reject_sensitive_content, validate_business_codes],
+        "Answer Agent": [reject_sensitive_content, validate_business_codes],
         "Confirmation Agent": [reject_sensitive_content],
         "Knowledge Agent": [reject_off_topic_queries, detect_spam_patterns],
         "Usage Agent": [detect_spam_patterns],
     }
     
-    return guardrails_map.get(agent_name, [reject_sensitive_content])
+    # Tentar carregar configuração específica do cliente
+    try:
+        client_config_file = guardrail_config.client_path / "agent_guardrails_config.yaml"
+        if client_config_file.exists():
+            with open(client_config_file, 'r', encoding='utf-8') as f:
+                client_config = yaml.safe_load(f)
+                return client_config.get(agent_name, default_guardrails_map.get(agent_name, [reject_sensitive_content]))
+    except Exception:
+        pass  # Usar configuração padrão se houver erro
+    
+    return default_guardrails_map.get(agent_name, [reject_sensitive_content])
+
+
+def reload_config():
+    """Recarrega configurações do template do cliente"""
+    global guardrail_config
+    guardrail_config = GuardrailConfig()
+
 
 if __name__ == "__main__":
-    print("🛡️ Input Guardrails para AtendentePro")
+    print("🛡️ Input Guardrails Genérico para AtendentePro")
+    print(f"Configuração carregada de: {guardrail_config.client_path}")
     print(f"Guardrails disponíveis: {len(AVAILABLE_GUARDRAILS)}")
-    print("✅ Sistema de segurança ativo")
+    print("✅ Sistema de segurança ativo e configurável")
