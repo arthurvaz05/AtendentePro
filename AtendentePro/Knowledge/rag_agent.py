@@ -12,14 +12,12 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import logging
 import os
-
-
 # Document processing imports
 import PyPDF2
 import docx
 from pptx import Presentation
 import fitz  # PyMuPDF for better PDF handling
-from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
+from openai import AzureOpenAI
 
 # Vector database and embeddings
 import numpy as np
@@ -324,12 +322,11 @@ class RAGAgent:
         # Import config here to avoid circular imports
         from config import DEFAULT_MODEL
 
-        self.client=AzureOpenAIEmbedding(
-            model="text-embedding-3-large",
+        self.client = AzureOpenAI(
             api_key=os.getenv("OPENAI_API_KEY_BRASILSOUTH"),
-            api_version=os.getenv("OPENAI_API_VERSION"),
             azure_endpoint=os.getenv("OPENAI_AZURE_ENDPOINT_BRASILSOUTH"),
-            )
+            api_version=os.getenv("OPENAI_API_VERSION"),
+        )
         self.provider = get_provider()
         self.default_model = DEFAULT_MODEL
         
@@ -357,7 +354,7 @@ class RAGAgent:
         # Create embeddings for chunks
         for i, chunk in enumerate(self.doc_processor.chunks):
             try:
-                response = await self.client.embeddings.create(
+                response = self.client.embeddings.create(
                     model="text-embedding-3-large",
                     input=chunk['content']
                 )
@@ -377,8 +374,8 @@ class RAGAgent:
         """Find most relevant chunks for a given query"""
         try:
             # Get query embedding
-            response = await self.client.embeddings.create(
-                model="text-embedding-3-small",
+            response = self.client.embeddings.create(
+                model="text-embedding-3-large",
                 input=query
             )
             query_embedding = response.data[0].embedding

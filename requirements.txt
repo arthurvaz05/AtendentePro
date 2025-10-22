@@ -33,8 +33,6 @@ pytest>=7.0.0
 azure-core
 azure-ai-vision-imageanalysis
 
-#azure embedding
-llama_index-embeddings-azure_openai
 
 # Async support (built-in with Python 3.7+)
 # asyncio is part of standard library
