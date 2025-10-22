@@ -1,0 +1,252 @@
+# Configuração de Guardrails para White Martins
+# Específico para domínio tributário e IVA
+
+# Palavras sensíveis específicas do domínio tributário
+sensitive_words:
+  # Segurança geral
+  - "password"
+  - "senha" 
+  - "token"
+  - "key"
+  - "secret"
+  - "hack"
+  - "exploit"
+  - "malware"
+  - "virus"
+  
+  # Domínio específico - Tributário/IVA
+  - "fraude"
+  - "sonegação"
+  - "evasão"
+  - "ilegal"
+  - "manipulação"
+  - "corrupção"
+  - "suborno"
+  - "lavagem"
+  - "contrabando"
+  
+  # Palavras ofensivas
+  - "idiota"
+  - "burro"
+  - "estúpido"
+  - "imbecil"
+  - "merda"
+  - "porra"
+  - "caralho"
+  - "foda"
+
+# Tópicos fora do escopo (não relacionados a tributário/IVA)
+off_topic_keywords:
+  # Criptomoedas e investimentos
+  - "bitcoin"
+  - "criptomoeda"
+  - "investimento"
+  - "ações"
+  - "bolsa"
+  
+  # Política e governo
+  - "política"
+  - "eleição"
+  - "governo"
+  - "presidente"
+  - "deputado"
+  
+  # Religião
+  - "religião"
+  - "deus"
+  - "jesus"
+  - "igreja"
+  - "bíblia"
+  
+  # Esportes e entretenimento
+  - "futebol"
+  - "esporte"
+  - "jogo"
+  - "filme"
+  - "música"
+  
+  # Culinária e receitas
+  - "receita"
+  - "cocina"
+  - "comida"
+  - "bolo"
+  - "pizza"
+  
+  # História e geografia
+  - "brasil"
+  - "descobriu"
+  - "história"
+  - "geografia"
+  - "país"
+
+# Padrões suspeitos de código malicioso
+suspicious_patterns:
+  - "delete\\s+.*"
+  - "drop\\s+.*"
+  - "exec\\s+.*"
+  - "eval\\s+.*"
+  - "system\\s+.*"
+  - "rm\\s+.*"
+  - "format\\s+.*"
+
+# Estrutura de tópicos e códigos IVA válidos (White Martins)
+topics:
+  compra_industrializacao:
+    description: "Compra para industrialização — material manufaturado ou processo produtivo"
+    codes:
+      - "I0"
+      - "ID"
+      - "IE"
+      - "I8"
+      - "I5"
+      - "I9"
+      - "I2"
+      - "I7"
+      - "I1"
+      - "I3"
+      - "I4"
+  compra_comercializacao:
+    description: "Compra para comercialização — produto para revenda sem alteração"
+    codes:
+      - "R0"
+      - "ID"
+      - "R6"
+      - "R1"
+      - "R5"
+      - "R3"
+      - "R2"
+      - "R4"
+  compra_ativo_operacional:
+    description: "Compra de ativo operacional — máquinas, equipamentos, cilindros (CIAP imediato)"
+    codes:
+      - "C0"
+      - "C6"
+      - "CA"
+      - "CI"
+      - "CB"
+      - "CD"
+  compra_ativo_projeto:
+    description: "Compra de ativo de projeto — ativos em andamento (CIAP após conclusão)"
+    codes:
+      - "C0"
+      - "C6"
+      - "CE"
+      - "CH"
+      - "CF"
+      - "CG"
+  consumo_administrativo_ativo_nao_operacional:
+    description: "Consumo administrativo e ativo não operacional — escritório, limpeza, mesas, TI"
+    codes:
+      - "C0"
+      - "C6"
+      - "C1"
+      - "C5"
+      - "C3"
+      - "C8"
+      - "C9"
+  aquisicao_frete:
+    description: "Aquisição de frete — serviços de transporte"
+    codes:
+      - "F0"
+      - "F1"
+      - "F5"
+      - "FE"
+      - "FA"
+      - "F2"
+      - "FC"
+      - "F7"
+      - "F3"
+      - "FD"
+      - "FB"
+      - "F4"
+  aquisicao_energia_eletrica:
+    description: "Aquisição de energia elétrica — produtiva vs administrativa"
+    codes:
+      - "E1"
+      - "E2"
+      - "E3"
+      - "E4"
+      - "E0"
+  aquisicao_servicos_ligados_a_operacao:
+    description: "Aquisição de serviços ligados à operação — manutenção, assistência técnica, engenharia"
+    codes:
+      - "YE"
+      - "YH"
+      - "YC"
+      - "YB"
+  aquisicao_servicos_nao_ligados_a_operacao:
+    description: "Aquisição de serviços não ligados à operação — consultorias, auditorias, inspeções"
+    codes:
+      - "YD"
+      - "YA"
+      - "YG"
+      - "YF"
+
+# Lista consolidada de todos os códigos válidos (para compatibilidade)
+valid_codes:
+  - "I0"
+  - "ID"
+  - "IE"
+  - "I8"
+  - "I5"
+  - "I9"
+  - "I2"
+  - "I7"
+  - "I1"
+  - "I3"
+  - "I4"
+  - "R0"
+  - "R6"
+  - "R1"
+  - "R5"
+  - "R3"
+  - "R2"
+  - "R4"
+  - "C0"
+  - "C6"
+  - "CA"
+  - "CI"
+  - "CB"
+  - "CD"
+  - "CE"
+  - "CH"
+  - "CF"
+  - "CG"
+  - "C1"
+  - "C5"
+  - "C3"
+  - "C8"
+  - "C9"
+  - "F0"
+  - "F1"
+  - "F5"
+  - "FE"
+  - "FA"
+  - "F2"
+  - "FC"
+  - "F7"
+  - "F3"
+  - "FD"
+  - "FB"
+  - "F4"
+  - "E1"
+  - "E2"
+  - "E3"
+  - "E4"
+  - "E0"
+  - "YE"
+  - "YH"
+  - "YC"
+  - "YB"
+  - "YD"
+  - "YA"
+  - "YG"
+  - "YF"
+
+# Configurações de spam
+min_message_length: 3
+
+spam_patterns:
+  - "(.)\\1{4,}"  # Repetição excessiva de caracteres
+  - "^[0-9]+$"    # Apenas números
+  - "^[a-zA-Z]{1}$"  # Apenas uma letra

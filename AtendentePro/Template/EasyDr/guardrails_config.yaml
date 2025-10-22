@@ -1,0 +1,93 @@
+# Configuração de Guardrails para EasyDr
+# Específico para domínio médico e saúde
+
+# Palavras sensíveis específicas do domínio médico
+sensitive_words:
+  # Segurança geral
+  - "password"
+  - "senha" 
+  - "token"
+  - "key"
+  - "secret"
+  - "hack"
+  - "exploit"
+  - "malware"
+  - "virus"
+  
+  # Domínio específico - Médico/Saúde
+  - "overdose"
+  - "suicídio"
+  - "eutanásia"
+  - "aborto"
+  - "drogas"
+  - "medicamento_controlado"
+  - "prescrição_falsa"
+  
+  # Palavras ofensivas
+  - "idiota"
+  - "burro"
+  - "estúpido"
+  - "imbecil"
+
+# Tópicos fora do escopo (não relacionados a saúde)
+off_topic_keywords:
+  # Criptomoedas e investimentos
+  - "bitcoin"
+  - "criptomoeda"
+  - "investimento"
+  - "ações"
+  - "bolsa"
+  
+  # Política e governo
+  - "política"
+  - "eleição"
+  - "governo"
+  - "presidente"
+  
+  # Religião
+  - "religião"
+  - "deus"
+  - "jesus"
+  - "igreja"
+  
+  # Esportes e entretenimento
+  - "futebol"
+  - "esporte"
+  - "jogo"
+  - "filme"
+  
+  # Culinária e receitas
+  - "receita"
+  - "cocina"
+  - "comida"
+  - "bolo"
+  
+  # História e geografia
+  - "brasil"
+  - "descobriu"
+  - "história"
+  - "geografia"
+
+# Padrões suspeitos de código malicioso
+suspicious_patterns:
+  - "delete\\s+.*"
+  - "drop\\s+.*"
+  - "exec\\s+.*"
+  - "eval\\s+.*"
+  - "system\\s+.*"
+
+# Códigos médicos válidos (EasyDr)
+valid_codes:
+  - "CID10"
+  - "CID11"
+  - "TUSS"
+  - "CBHPM"
+  - "AMB"
+  - "SUS"
+
+# Configurações de spam
+min_message_length: 5
+
+spam_patterns:
+  - "(.)\\1{4,}"  # Repetição excessiva de caracteres
+  - "^[0-9]+$"    # Apenas números

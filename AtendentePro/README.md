@@ -15,8 +15,10 @@ AtendentePro is a multi-agent customer-support workflow built with the OpenAI Ag
    - Can hand off to Flow, Confirmation, Knowledge, or Usage agents.
 
 2. **Flow Agent (`Flow/flow_agent.py`)**
-   - Determines which interview should run or, if enough data exists, whether to request clarification.
-   - Delegates to the Interview agent for structured data collection.
+   - Intelligently identifies topics from user input using keyword matching.
+   - If topic is clearly identified, transfers immediately to Interview Agent.
+   - If topic is ambiguous, presents available topics for user selection.
+   - Focuses on handoff rather than producing structured output.
 
 3. **Interview Agent (`Interview/interview_agent.py`)**
    - Collects detailed answers using prompts defined in `Interview/interview_prompts.py`.
@@ -148,15 +150,16 @@ All prompt modules follow a consistent structure:
 - **Workflow**: Direct tool-based routing without complex reasoning steps
 
 #### 2. **Flow Agent Prompts** (`Flow/flow_prompts.py`)
-- **Purpose**: Intelligent topic identification and user confirmation
+- **Purpose**: Intelligent topic identification and automatic handoff
 - **Workflow**: `[READ] → [SUMMARY] → [ANALYZE] → [QUESTION] → [VERIFY] → [REVIEW] → [OUTPUT]`
 - **Key Features**:
   - **Smart Detection**: `[ANALYZE]` step detects specific topics from user input using `flow_keywords`
-  - **Intelligent Routing**: If topic is clearly identified, skips presentation and goes directly to Interview
+  - **Immediate Transfer**: If topic is clearly identified, transfers immediately to Interview Agent
   - **Fallback Presentation**: Only shows topic list when user input is ambiguous
-  - **Confirmation Required**: Explicit user confirmation before proceeding
+  - **Confirmation Transfer**: When user confirms a topic, transfers immediately to Interview Agent
   - **Keyword Matching**: Uses `flow_keywords` for intelligent topic detection
-- **Output**: `FlowOutput` with selected topic and reasoning
+  - **No Structured Output**: Focuses on handoff rather than producing structured data
+- **Behavior**: Direct handoff to Interview Agent without producing FlowOutput
 
 #### 3. **Interview Agent Prompts** (`Interview/interview_prompts.py`)
 - **Purpose**: Structured data collection through guided questions
@@ -222,7 +225,7 @@ The `[ANALYZE]` step is a key innovation in the prompt architecture that provide
 - **Purpose**: Detect specific topics from user input using keywords
 - **Function**: Analyzes user message against `flow_keywords` to identify clear topic matches
 - **Behavior**: 
-  - If topic is clearly identified → Skip to `[VERIFY]` and proceed directly to Interview
+  - If topic is clearly identified → Transfer immediately to Interview Agent
   - If topic is ambiguous → Continue to `[QUESTION]` for topic presentation
 - **Benefit**: Eliminates unnecessary topic enumeration when user intent is clear
 
@@ -253,6 +256,174 @@ Prompts are dynamically enhanced with:
 - **Metadata**: Document descriptions and usage hints
 
 This architecture ensures consistent behavior while allowing client-specific customization through the Template system.
+
+---
+
+## Input Guardrails System
+
+AtendentePro includes a comprehensive, **generic and configurable** input guardrail system that monitors and validates user inputs in real-time, providing security and ensuring appropriate usage across different clients and domains.
+
+### 🏗️ **Architecture Overview**
+
+The guardrail system is designed with **client-specific configurations** that can be easily customized for different businesses:
+
+```
+AtendentePro/
+├── guardrails.py                    # Generic guardrail functions
+├── Template/
+│   ├── White_Martins/               # Client-specific configs
+│   │   ├── guardrails_config.yaml   # Guardrail rules & topics
+│   │   └── agent_guardrails_config.yaml # Agent-to-guardrail mapping
+│   └── EasyDr/                      # Another client example
+│       └── guardrails_config.yaml
+```
+
+### 🔧 **Generic Guardrail Functions**
+
+#### 1. **Content Security** (`reject_sensitive_content`)
+- **Purpose**: Blocks sensitive words and suspicious patterns
+- **Configuration**: Loads sensitive words from client YAML
+- **Protects Against**: Passwords, hacking attempts, malicious code, domain-specific fraud
+
+#### 2. **Topic Validation** (`reject_off_topic_queries`)
+- **Purpose**: Ensures queries stay within business scope
+- **Configuration**: Loads off-topic keywords from client YAML
+- **Blocks**: Cryptocurrency, politics, religion, sports, cooking, etc.
+
+#### 3. **Business Code Validation** (`validate_business_codes`)
+- **Purpose**: Validates business-specific codes (IVA, product codes, etc.)
+- **Configuration**: Loads valid codes from client YAML
+- **Regex Pattern**: `\b([A-Z]\d|[A-Z]{2,3}|\d{2,3})\b`
+- **Blocks**: Invalid or non-existent codes
+
+#### 4. **Topic & Code Context Validation** (`validate_topic_and_codes`)
+- **Purpose**: Validates codes within specific topic contexts
+- **Configuration**: Loads topics with their associated codes and descriptions
+- **Advanced Logic**: Ensures codes match the context of the conversation
+- **Example**: Code "I0" must be used in "industrialization" context, not "commercialization"
+
+#### 5. **Spam Detection** (`detect_spam_patterns`)
+- **Purpose**: Detects spam and repetitive patterns
+- **Configuration**: Configurable minimum length and spam patterns
+- **Blocks**: Excessive character repetition, very short messages
+
+### 🎯 **Agent-Specific Guardrail Assignment**
+
+Guardrails are dynamically assigned to agents based on `agent_guardrails_config.yaml`:
+
+```yaml
+# Example configuration
+Triage Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
+
+Flow Agent:
+  - reject_off_topic_queries
+
+Interview Agent:
+  - reject_sensitive_content
+
+Answer Agent:
+  - reject_sensitive_content
+  - validate_topic_and_codes  # Only Answer Agent handles codes
+
+Confirmation Agent:
+  - reject_sensitive_content
+
+Knowledge Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
+
+Usage Agent:
+  - detect_spam_patterns
+```
+
+### 📋 **Client Configuration Structure**
+
+#### **guardrails_config.yaml**
+```yaml
+# Sensitive words and patterns
+sensitive_words:
+  - "password"
+  - "hack"
+  - "fraud"
+
+# Off-topic keywords
+off_topic_keywords:
+  - "bitcoin"
+  - "politics"
+  - "weather"
+
+# Business topics with codes
+topics:
+  compra_industrializacao:
+    description: "Compra para industrialização"
+    codes: ["I0", "ID", "IE", "I8", "I5", "I9", "I2", "I7", "I1", "I3", "I4"]
+  
+  compra_comercializacao:
+    description: "Compra para comercialização"
+    codes: ["E0", "ED", "EE", "E8", "E5", "E9", "E2", "E7", "E1", "E3", "E4"]
+
+# All valid codes (consolidated)
+valid_codes:
+  - "I0"
+  - "ID"
+  - "E0"
+  - "ED"
+  # ... etc
+
+# Spam detection settings
+min_message_length: 3
+spam_patterns: []
+```
+
+### 🧪 **Comprehensive Testing**
+
+The system includes extensive test coverage:
+
+```bash
+# Run all guardrail tests
+python AtendentePro/tests/test_guardrails_comprehensive.py
+
+# Test specific scenarios
+python AtendentePro/tests/test_guardrails_topics.py
+python AtendentePro/tests/test_guardrails_generic.py
+```
+
+**Test Scenarios Covered**:
+- ✅ Valid codes in correct contexts
+- ✅ Valid codes in wrong contexts (blocked)
+- ✅ Invalid/non-existent codes (blocked)
+- ✅ Off-topic queries (blocked)
+- ✅ Sensitive content (blocked)
+- ✅ Spam patterns (blocked)
+- ✅ Mixed valid/invalid scenarios
+- ✅ Edge cases and boundary conditions
+
+### 🚀 **Usage**
+
+Guardrails run **automatically** in parallel with agent execution:
+
+1. **No Configuration Needed**: Guardrails are integrated into each agent definition
+2. **Dynamic Loading**: Configurations are loaded from client-specific YAML files
+3. **Real-time Validation**: Inputs are validated before agent processing
+4. **Graceful Rejection**: Invalid inputs are blocked with clear error messages
+
+### 🔄 **Multi-Client Support**
+
+The system supports multiple clients with different configurations:
+
+- **White Martins**: IVA codes, energy electricity, industrial/commercial topics
+- **EasyDr**: Medical codes, patient data, healthcare topics
+- **Custom Clients**: Easy to add new client configurations
+
+### 🛡️ **Security Features**
+
+- **Regex-based Code Detection**: Sophisticated pattern matching for business codes
+- **Context Validation**: Ensures codes are used in appropriate contexts
+- **Common Word Filtering**: Prevents false positives from common words
+- **Case-insensitive Matching**: Handles various input formats
+- **Configurable Sensitivity**: Adjustable rules per client needs
 
 ---
 
