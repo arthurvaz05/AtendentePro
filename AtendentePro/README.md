@@ -259,54 +259,171 @@ This architecture ensures consistent behavior while allowing client-specific cus
 
 ---
 
-## Input Guardrails
+## Input Guardrails System
 
-AtendentePro includes a comprehensive input guardrail system that monitors and validates user inputs in real-time, providing security and ensuring appropriate usage.
+AtendentePro includes a comprehensive, **generic and configurable** input guardrail system that monitors and validates user inputs in real-time, providing security and ensuring appropriate usage across different clients and domains.
 
-### Guardrail Functions
+### 🏗️ **Architecture Overview**
+
+The guardrail system is designed with **client-specific configurations** that can be easily customized for different businesses:
+
+```
+AtendentePro/
+├── guardrails.py                    # Generic guardrail functions
+├── Template/
+│   ├── White_Martins/               # Client-specific configs
+│   │   ├── guardrails_config.yaml   # Guardrail rules & topics
+│   │   └── agent_guardrails_config.yaml # Agent-to-guardrail mapping
+│   └── EasyDr/                      # Another client example
+│       └── guardrails_config.yaml
+```
+
+### 🔧 **Generic Guardrail Functions**
 
 #### 1. **Content Security** (`reject_sensitive_content`)
 - **Purpose**: Blocks sensitive words and suspicious patterns
-- **Protects Against**: Passwords, hacking attempts, malicious code
-- **Domain-Specific**: IVA fraud, energy manipulation, offensive language
+- **Configuration**: Loads sensitive words from client YAML
+- **Protects Against**: Passwords, hacking attempts, malicious code, domain-specific fraud
 
 #### 2. **Topic Validation** (`reject_off_topic_queries`)
-- **Purpose**: Ensures queries stay within AtendentePro scope
-- **Blocks**: Cryptocurrency, politics, religion, sports, cooking
-- **Allows**: IVA codes, energy electricity, company services
+- **Purpose**: Ensures queries stay within business scope
+- **Configuration**: Loads off-topic keywords from client YAML
+- **Blocks**: Cryptocurrency, politics, religion, sports, cooking, etc.
 
-#### 3. **IVA Code Validation** (`validate_iva_codes`)
-- **Purpose**: Validates IVA codes mentioned in queries
-- **Validates**: Against predefined list of valid codes (01-30)
-- **Blocks**: Invalid or non-existent IVA codes
+#### 3. **Business Code Validation** (`validate_business_codes`)
+- **Purpose**: Validates business-specific codes (IVA, product codes, etc.)
+- **Configuration**: Loads valid codes from client YAML
+- **Regex Pattern**: `\b([A-Z]\d|[A-Z]{2,3}|\d{2,3})\b`
+- **Blocks**: Invalid or non-existent codes
 
-#### 4. **Spam Detection** (`detect_spam_patterns`)
+#### 4. **Topic & Code Context Validation** (`validate_topic_and_codes`)
+- **Purpose**: Validates codes within specific topic contexts
+- **Configuration**: Loads topics with their associated codes and descriptions
+- **Advanced Logic**: Ensures codes match the context of the conversation
+- **Example**: Code "I0" must be used in "industrialization" context, not "commercialization"
+
+#### 5. **Spam Detection** (`detect_spam_patterns`)
 - **Purpose**: Detects spam and repetitive patterns
+- **Configuration**: Configurable minimum length and spam patterns
 - **Blocks**: Excessive character repetition, very short messages
-- **Protects**: Against automated spam attacks
 
-### Agent-Specific Guardrails
+### 🎯 **Agent-Specific Guardrail Assignment**
 
-Each agent uses tailored guardrails based on its function:
+Guardrails are dynamically assigned to agents based on `agent_guardrails_config.yaml`:
 
-- **Triage Agent**: Topic validation + spam detection
-- **Flow Agent**: Topic validation + IVA code validation
-- **Interview Agent**: Content security + IVA code validation
-- **Answer Agent**: Content security + IVA code validation
-- **Confirmation Agent**: Content security
-- **Knowledge Agent**: Topic validation + spam detection
-- **Usage Agent**: Spam detection
+```yaml
+# Example configuration
+Triage Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
 
-### Usage
+Flow Agent:
+  - reject_off_topic_queries
 
-Guardrails run automatically in parallel with agent execution. No additional configuration needed - they're integrated into each agent definition.
+Interview Agent:
+  - reject_sensitive_content
 
-### Testing Guardrails
+Answer Agent:
+  - reject_sensitive_content
+  - validate_topic_and_codes  # Only Answer Agent handles codes
 
-Run the test example to see guardrails in action:
-```bash
-python AtendentePro/examples/test_guardrails.py
+Confirmation Agent:
+  - reject_sensitive_content
+
+Knowledge Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
+
+Usage Agent:
+  - detect_spam_patterns
 ```
+
+### 📋 **Client Configuration Structure**
+
+#### **guardrails_config.yaml**
+```yaml
+# Sensitive words and patterns
+sensitive_words:
+  - "password"
+  - "hack"
+  - "fraud"
+
+# Off-topic keywords
+off_topic_keywords:
+  - "bitcoin"
+  - "politics"
+  - "weather"
+
+# Business topics with codes
+topics:
+  compra_industrializacao:
+    description: "Compra para industrialização"
+    codes: ["I0", "ID", "IE", "I8", "I5", "I9", "I2", "I7", "I1", "I3", "I4"]
+  
+  compra_comercializacao:
+    description: "Compra para comercialização"
+    codes: ["E0", "ED", "EE", "E8", "E5", "E9", "E2", "E7", "E1", "E3", "E4"]
+
+# All valid codes (consolidated)
+valid_codes:
+  - "I0"
+  - "ID"
+  - "E0"
+  - "ED"
+  # ... etc
+
+# Spam detection settings
+min_message_length: 3
+spam_patterns: []
+```
+
+### 🧪 **Comprehensive Testing**
+
+The system includes extensive test coverage:
+
+```bash
+# Run all guardrail tests
+python AtendentePro/tests/test_guardrails_comprehensive.py
+
+# Test specific scenarios
+python AtendentePro/tests/test_guardrails_topics.py
+python AtendentePro/tests/test_guardrails_generic.py
+```
+
+**Test Scenarios Covered**:
+- ✅ Valid codes in correct contexts
+- ✅ Valid codes in wrong contexts (blocked)
+- ✅ Invalid/non-existent codes (blocked)
+- ✅ Off-topic queries (blocked)
+- ✅ Sensitive content (blocked)
+- ✅ Spam patterns (blocked)
+- ✅ Mixed valid/invalid scenarios
+- ✅ Edge cases and boundary conditions
+
+### 🚀 **Usage**
+
+Guardrails run **automatically** in parallel with agent execution:
+
+1. **No Configuration Needed**: Guardrails are integrated into each agent definition
+2. **Dynamic Loading**: Configurations are loaded from client-specific YAML files
+3. **Real-time Validation**: Inputs are validated before agent processing
+4. **Graceful Rejection**: Invalid inputs are blocked with clear error messages
+
+### 🔄 **Multi-Client Support**
+
+The system supports multiple clients with different configurations:
+
+- **White Martins**: IVA codes, energy electricity, industrial/commercial topics
+- **EasyDr**: Medical codes, patient data, healthcare topics
+- **Custom Clients**: Easy to add new client configurations
+
+### 🛡️ **Security Features**
+
+- **Regex-based Code Detection**: Sophisticated pattern matching for business codes
+- **Context Validation**: Ensures codes are used in appropriate contexts
+- **Common Word Filtering**: Prevents false positives from common words
+- **Case-insensitive Matching**: Handles various input formats
+- **Configurable Sensitivity**: Adjustable rules per client needs
 
 ---
 

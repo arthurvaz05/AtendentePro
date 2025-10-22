@@ -77,6 +77,25 @@ class GuardrailConfig:
         """Retorna lista de códigos válidos"""
         return self.config.get("valid_codes", [])
     
+    def get_topics(self) -> Dict[str, Dict[str, Any]]:
+        """Retorna estrutura de tópicos com códigos"""
+        return self.config.get("topics", {})
+    
+    def get_codes_for_topic(self, topic_name: str) -> List[str]:
+        """Retorna códigos válidos para um tópico específico"""
+        topics = self.get_topics()
+        if topic_name in topics:
+            return topics[topic_name].get("codes", [])
+        return []
+    
+    def get_all_valid_codes_from_topics(self) -> List[str]:
+        """Retorna todos os códigos válidos de todos os tópicos"""
+        all_codes = []
+        topics = self.get_topics()
+        for topic_data in topics.values():
+            all_codes.extend(topic_data.get("codes", []))
+        return list(set(all_codes))  # Remove duplicatas
+    
     def get_min_message_length(self) -> int:
         """Retorna tamanho mínimo de mensagem"""
         return self.config.get("min_message_length", 3)
@@ -178,7 +197,10 @@ def validate_business_codes(data: ToolInputGuardrailData) -> ToolGuardrailFuncti
     except json.JSONDecodeError:
         return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
 
-    valid_codes = guardrail_config.get_valid_codes()
+    # Usar códigos dos tópicos se disponível, senão usar lista consolidada
+    valid_codes = guardrail_config.get_all_valid_codes_from_topics()
+    if not valid_codes:
+        valid_codes = guardrail_config.get_valid_codes()
     
     # Se não há códigos configurados, não validar
     if not valid_codes:
@@ -187,23 +209,112 @@ def validate_business_codes(data: ToolInputGuardrailData) -> ToolGuardrailFuncti
     for key, value in args.items():
         value_str = str(value)
         
-        # Procurar por códigos no texto (padrão genérico)
-        code_pattern = r'\b(\d{2,})\b'  # Códigos de 2 ou mais dígitos
+        # Procurar por códigos IVA no texto (padrão específico para IVA)
+        code_pattern = r'\b([A-Za-z]\d|[A-Za-z]{2})\b'  # Aceitar maiúsculas e minúsculas
         matches = re.findall(code_pattern, value_str)
+        matches = [match.upper() for match in matches]  # Converter para maiúsculas
         
         for match in matches:
             if match not in valid_codes:
                 return ToolGuardrailFunctionOutput.reject_content(
-                    message=f"🚨 Código inválido: '{match}' não é um código válido",
+                    message=f"🚨 Código IVA inválido: '{match}' não é um código válido",
                     output_info={
                         "invalid_code": match,
                         "argument": key,
-                        "reason": "codigo_invalido",
-                        "valid_codes": valid_codes[:10]  # Mostrar apenas alguns exemplos
+                        "reason": "codigo_iva_invalido",
+                        "valid_codes_sample": valid_codes[:10]  # Mostrar apenas alguns exemplos
                     },
                 )
 
-    return ToolGuardrailFunctionOutput(output_info="Códigos validados")
+    return ToolGuardrailFunctionOutput(output_info="Códigos IVA validados")
+
+
+@tool_input_guardrail
+def validate_topic_and_codes(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
+    """
+    Valida tópicos e códigos específicos por tópico.
+    Validação baseada na estrutura de tópicos do template do cliente.
+    """
+    try:
+        args = json.loads(data.context.tool_arguments) if data.context.tool_arguments else {}
+    except json.JSONDecodeError:
+        return ToolGuardrailFunctionOutput(output_info="Argumentos JSON inválidos")
+
+    topics = guardrail_config.get_topics()
+    
+    # Se não há tópicos configurados, não validar
+    if not topics:
+        return ToolGuardrailFunctionOutput(output_info="Validação de tópicos não configurada")
+
+    for key, value in args.items():
+        value_str = str(value).lower()
+        
+        # Procurar por códigos IVA no texto
+        code_pattern = r'\b([A-Za-z]\d|[A-Za-z]{2})\b'  # Aceitar maiúsculas e minúsculas
+        matches = re.findall(code_pattern, value_str)
+        matches = [match.upper() for match in matches]  # Converter para maiúsculas
+        
+        if matches:
+            # Para cada código encontrado, verificar se está no tópico correto
+            for code in matches:
+                code_found_in_topic = False
+                topic_for_code = None
+                
+                # Encontrar em qual tópico o código está
+                for topic_name, topic_data in topics.items():
+                    if code in topic_data.get("codes", []):
+                        code_found_in_topic = True
+                        topic_for_code = topic_name
+                        break
+                
+                if not code_found_in_topic:
+                    return ToolGuardrailFunctionOutput.reject_content(
+                        message=f"🚨 Código IVA '{code}' não encontrado em nenhum tópico válido",
+                        output_info={
+                            "invalid_code": code,
+                            "argument": key,
+                            "reason": "codigo_nao_encontrado_em_topicos",
+                            "available_topics": list(topics.keys())
+                        },
+                    )
+                
+                # Verificar se o contexto da pergunta corresponde ao tópico do código
+                topic_description = topics[topic_for_code].get("description", "").lower()
+                
+                # Palavras-chave que indicam contexto do tópico
+                topic_keywords = {
+                    "compra_industrializacao": ["industrialização", "industrial", "produção", "manufaturado"],
+                    "compra_comercializacao": ["comercialização", "revenda", "comercial"],
+                    "compra_ativo_operacional": ["ativo operacional", "máquina", "equipamento", "cilindro"],
+                    "compra_ativo_projeto": ["ativo projeto", "projeto", "andamento"],
+                    "consumo_administrativo_ativo_nao_operacional": ["administrativo", "escritório", "limpeza", "ti"],
+                    "aquisicao_frete": ["frete", "transporte", "logística"],
+                    "aquisicao_energia_eletrica": ["energia", "elétrica", "eletricidade"],
+                    "aquisicao_servicos_ligados_a_operacao": ["serviço operação", "manutenção", "assistência", "engenharia"],
+                    "aquisicao_servicos_nao_ligados_a_operacao": ["serviço não operação", "consultoria", "auditoria", "inspeção"]
+                }
+                
+                # Verificar se o contexto da pergunta corresponde ao tópico
+                context_matches = False
+                if topic_for_code in topic_keywords:
+                    for keyword in topic_keywords[topic_for_code]:
+                        if keyword in value_str:
+                            context_matches = True
+                            break
+                
+                if not context_matches:
+                    return ToolGuardrailFunctionOutput.reject_content(
+                        message=f"🚨 Código IVA '{code}' não corresponde ao contexto da pergunta. Este código é para: {topic_description}",
+                        output_info={
+                            "code": code,
+                            "expected_topic": topic_for_code,
+                            "topic_description": topic_description,
+                            "argument": key,
+                            "reason": "codigo_contexto_incompativel"
+                        },
+                    )
+
+    return ToolGuardrailFunctionOutput(output_info="Tópicos e códigos validados")
 
 
 @tool_input_guardrail
@@ -254,6 +365,7 @@ AVAILABLE_GUARDRAILS = [
     reject_sensitive_content,
     reject_off_topic_queries,
     validate_business_codes,
+    validate_topic_and_codes,
     detect_spam_patterns,
 ]
 
@@ -266,9 +378,9 @@ def get_guardrails_for_agent(agent_name: str) -> List:
     # Configuração padrão genérica
     default_guardrails_map = {
         "Triage Agent": [reject_off_topic_queries, detect_spam_patterns],
-        "Flow Agent": [reject_off_topic_queries, validate_business_codes],
-        "Interview Agent": [reject_sensitive_content, validate_business_codes],
-        "Answer Agent": [reject_sensitive_content, validate_business_codes],
+        "Flow Agent": [reject_off_topic_queries],
+        "Interview Agent": [reject_sensitive_content],
+        "Answer Agent": [reject_sensitive_content, validate_topic_and_codes],
         "Confirmation Agent": [reject_sensitive_content],
         "Knowledge Agent": [reject_off_topic_queries, detect_spam_patterns],
         "Usage Agent": [detect_spam_patterns],

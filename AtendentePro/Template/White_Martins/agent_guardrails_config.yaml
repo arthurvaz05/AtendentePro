@@ -8,15 +8,13 @@ Triage Agent:
 
 Flow Agent:
   - reject_off_topic_queries
-  - validate_business_codes
 
 Interview Agent:
   - reject_sensitive_content
-  - validate_business_codes
 
 Answer Agent:
   - reject_sensitive_content
-  - validate_business_codes
+  - validate_topic_and_codes
 
 Confirmation Agent:
   - reject_sensitive_content
