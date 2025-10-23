@@ -67,13 +67,30 @@ class GuardrailsTester:
                 cwd=self.base_dir
             )
             
+            # Determinar se foi sucesso baseado no comportamento esperado
+            # InputGuardrailTripwireTriggered é sucesso para perguntas fora do escopo
+            stderr_lower = result.stderr.lower()
+            is_guardrail_tripwire = "inputguardrailtripwiretriggered" in stderr_lower
+            
+            # Determinar se é pergunta fora do escopo
+            is_out_of_scope = any(phrase in question.lower() for phrase in [
+                "descobriu o brasil", "equação", "python", "filme", "bolo"
+            ])
+            
+            # Sucesso se:
+            # 1. Return code 0 (execução normal)
+            # 2. Guardrail tripwire para pergunta fora do escopo (comportamento correto)
+            success = (result.returncode == 0) or (is_guardrail_tripwire and is_out_of_scope)
+            
             return {
                 "agent": agent,
                 "question": question,
                 "return_code": result.returncode,
                 "stdout": result.stdout,
                 "stderr": result.stderr,
-                "success": result.returncode == 0
+                "success": success,
+                "is_guardrail_tripwire": is_guardrail_tripwire,
+                "is_out_of_scope": is_out_of_scope
             }
             
         except subprocess.TimeoutExpired:
@@ -100,7 +117,11 @@ class GuardrailsTester:
         stdout = result["stdout"].lower()
         stderr = result["stderr"].lower()
         
-        # Indicadores de guardrails funcionando
+        # Usar informações já calculadas
+        is_out_of_scope = result.get("is_out_of_scope", False)
+        is_guardrail_tripwire = result.get("is_guardrail_tripwire", False)
+        
+        # Indicadores de guardrails funcionando (respostas educativas)
         guardrail_indicators = [
             "fora do escopo",
             "não relacionado",
@@ -108,7 +129,9 @@ class GuardrailsTester:
             "processos fiscais",
             "tributação brasileira",
             "códigos iva",
-            "white martins"
+            "white martins",
+            "desculpe, mas só posso",
+            "sua pergunta não está relacionada"
         ]
         
         # Indicadores de resposta inadequada
@@ -125,18 +148,24 @@ class GuardrailsTester:
         guardrails_working = any(indicator in stdout for indicator in guardrail_indicators)
         inappropriate_response = any(indicator in stdout for indicator in inappropriate_indicators)
         
-        # Determinar se é pergunta dentro ou fora do escopo
-        is_out_of_scope = any(phrase in result["question"].lower() for phrase in [
-            "descobriu o brasil", "equação", "python", "filme", "bolo"
-        ])
+        # Comportamento correto:
+        # 1. Para perguntas fora do escopo: guardrail tripwire OU resposta educativa
+        # 2. Para perguntas dentro do escopo: resposta adequada sem tripwire
+        if is_out_of_scope:
+            correct_behavior = is_guardrail_tripwire or guardrails_working
+            actual_behavior = "block" if (is_guardrail_tripwire or guardrails_working) else "allow"
+        else:
+            correct_behavior = not inappropriate_response and not is_guardrail_tripwire
+            actual_behavior = "allow" if not inappropriate_response else "block"
         
         return {
             "guardrails_working": guardrails_working,
             "inappropriate_response": inappropriate_response,
             "is_out_of_scope": is_out_of_scope,
+            "is_guardrail_tripwire": is_guardrail_tripwire,
             "expected_behavior": "block" if is_out_of_scope else "allow",
-            "actual_behavior": "block" if guardrails_working else "allow",
-            "correct_behavior": (is_out_of_scope and guardrails_working) or (not is_out_of_scope and not inappropriate_response)
+            "actual_behavior": actual_behavior,
+            "correct_behavior": correct_behavior
         }
     
     def run_quick_test(self):
@@ -223,9 +252,17 @@ class GuardrailsTester:
         
         # Guardrails funcionando
         print(f"\n✅ GUARDRAILS FUNCIONANDO:")
-        working = [r for r in results if r["guardrails_working"]]
+        working = [r for r in results if r["guardrails_working"] or r.get("is_guardrail_tripwire", False)]
         for work in working:
-            print(f"   {work['agent'].upper()}: {work['question']}")
+            tripwire_info = " (TRIPWIRE)" if work.get("is_guardrail_tripwire", False) else " (RESPOSTA EDUCATIVA)"
+            print(f"   {work['agent'].upper()}: {work['question']}{tripwire_info}")
+        
+        # Detalhes dos tripwires
+        tripwires = [r for r in results if r.get("is_guardrail_tripwire", False)]
+        if tripwires:
+            print(f"\n🚫 GUARDRAIL TRIPWIRES (Bloqueios Corretos):")
+            for tripwire in tripwires:
+                print(f"   {tripwire['agent'].upper()}: {tripwire['question']}")
 
 def main():
     """Função principal - executa teste rápido por padrão"""

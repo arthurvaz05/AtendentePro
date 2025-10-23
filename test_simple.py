@@ -29,8 +29,27 @@ def test_agent(agent_name: str, question: str):
         if result.stderr:
             print(f"⚠️ Erros:")
             print(result.stderr)
-            
-        return result.returncode == 0
+        
+        # Determinar se foi sucesso baseado no comportamento esperado
+        stderr_lower = result.stderr.lower()
+        is_guardrail_tripwire = "inputguardrailtripwiretriggered" in stderr_lower
+        
+        # Determinar se é pergunta fora do escopo
+        is_out_of_scope = any(phrase in question.lower() for phrase in [
+            "descobriu o brasil", "equação", "python", "filme", "bolo"
+        ])
+        
+        # Sucesso se:
+        # 1. Return code 0 (execução normal)
+        # 2. Guardrail tripwire para pergunta fora do escopo (comportamento correto)
+        success = (result.returncode == 0) or (is_guardrail_tripwire and is_out_of_scope)
+        
+        if is_guardrail_tripwire and is_out_of_scope:
+            print(f"✅ GUARDRAIL TRIPWIRE: Comportamento correto para pergunta fora do escopo!")
+        elif is_guardrail_tripwire and not is_out_of_scope:
+            print(f"❌ GUARDRAIL TRIPWIRE: Comportamento incorreto para pergunta dentro do escopo!")
+        
+        return success
         
     except subprocess.TimeoutExpired:
         print("⏰ Timeout - comando demorou mais de 30 segundos")
