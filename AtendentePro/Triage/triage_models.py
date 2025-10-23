@@ -4,7 +4,7 @@ import yaml
 from typing import Dict, Any, Optional
 
 # Este arquivo foi simplificado após a remoção do sistema de keywords
-# O sistema de guardrails agora gerencia o roteamento de forma mais inteligente
+# Sistema de triage simplificado
 
 # Mantido apenas para compatibilidade com imports existentes
 triage_keywords_map = {}
@@ -67,6 +67,10 @@ def get_triage_about_template() -> str:
     """Obtém o template 'about' do triage_agent do guardrails_config.yaml"""
     config = load_guardrail_config()
     triage_about = config.get('agent_scopes', {}).get('triage_agent', {}).get('about', '')
+    
+    if not triage_about:
+        return "Sistema de triage genérico"
+    
     return triage_about.strip()
 
 def get_triage_keywords() -> Dict[str, Any]:

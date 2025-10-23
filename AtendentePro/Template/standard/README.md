@@ -5,7 +5,6 @@ Esta pasta contém as configurações padrão genéricas do sistema AtendentePro
 ## 📁 Arquivos Incluídos
 
 ### Configurações Principais
-- **`guardrails_config.yaml`** - Configuração genérica do sistema de guardrails
 - **`triage_config.yaml`** - Configuração genérica do sistema de triage
 
 ### Configurações por Agente
@@ -45,7 +44,6 @@ cp -r AtendentePro/Template/standard AtendentePro/Template/[NOME_CLIENTE]
 ```
 
 2. **Customize as configurações:**
-   - Edite `guardrails_config.yaml` com escopos específicos
    - Ajuste `triage_config.yaml` com keywords relevantes
    - Personalize configurações de agentes conforme necessário
 

@@ -6,7 +6,6 @@ from AtendentePro import config
 from AtendentePro.Answer.answer_prompts import answer_prompts_agent
 from AtendentePro.Template.White_Martins.answer_config import AnswerOutput
 from AtendentePro.context import ContextNote
-from AtendentePro.guardrails import get_guardrails_for_agent
 
 answer_agent = Agent[ContextNote](
     name="Answer Agent",
@@ -15,7 +14,6 @@ answer_agent = Agent[ContextNote](
     """,
     instructions=f"{config.RECOMMENDED_PROMPT_PREFIX} {answer_prompts_agent}",
     handoffs=[],
-    input_guardrails=get_guardrails_for_agent("answer_agent"),
     output_type=AgentOutputSchema(AnswerOutput, strict_json_schema=False),
 )
 

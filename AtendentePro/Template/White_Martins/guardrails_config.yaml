@@ -1,5 +1,5 @@
-# Configuração de Guardrails para White Martins
-# Informações específicas sobre os agentes para o cliente White Martins
+# Configuração de Guardrails - White Martins
+# Este arquivo contém as configurações específicas para o sistema de guardrails
 
 agent_scopes:
   triage_agent:
@@ -15,65 +15,48 @@ agent_scopes:
 
   flow_agent:
     about: |
-      O Flow Agent da White Martins identifica e categoriza diferentes tipos de operações
-      fiscais e comerciais. Ele deve reconhecer e direcionar consultas sobre: compra para
-      industrialização, compra para comercialização, compra de ativo operacional, compra de
-      ativo de projeto, consumo administrativo e ativo não operacional, aquisição de frete,
-      aquisição de energia elétrica, aquisição de serviços ligados à operação, e aquisição
-      de serviços não ligados à operação. Não deve responder sobre outros tipos de operações
-      não listadas ou assuntos não relacionados à tributação e processos fiscais.
+      O Flow Agent da White Martins identifica e categoriza tipos de operações fiscais 
+      e comerciais. Ele deve reconhecer perguntas sobre: compra para industrialização,
+      compra para comercialização, ativo operacional, ativo projeto, consumo administrativo,
+      aquisição de frete, energia elétrica, serviços ligados à operação, serviços não ligados
+      à operação, tipo de operação, finalidade da compra, categoria da operação, código IVA.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
 
   interview_agent:
     about: |
-      O Interview Agent da White Martins conduz entrevistas estruturadas para determinar
-      códigos IVA corretos para diferentes tipos de compras e aquisições. Ele deve coletar
-      informações sobre: tipo de operação (industrialização, comercialização, ativo operacional,
-      consumo, serviços, energia, frete), status do fornecedor (Simples Nacional), impostos
-      destacados, e características específicas da operação. Não deve coletar informações
-      pessoais confidenciais, dados de concorrentes ou informações não relacionadas à
-      determinação fiscal.
+      O Interview Agent da White Martins conduz entrevistas estruturadas para determinação
+      de códigos IVA específicos. Ele deve reconhecer perguntas sobre: processos de entrevista,
+      coleta de informações fiscais, determinação de códigos IVA, validação de operações,
+      esclarecimentos sobre tributação brasileira. Não deve responder sobre matemática,
+      programação, entretenimento ou assuntos pessoais.
 
   answer_agent:
     about: |
-      O Answer Agent da White Martins fornece respostas técnicas precisas sobre códigos IVA
-      e tributação para diferentes tipos de operações comerciais. Ele deve responder sobre:
-      compra para industrialização, compra para comercialização, compra de ativo operacional,
-      compra de ativo de projeto, consumo administrativo e ativo não operacional, aquisição
-      de frete, aquisição de energia elétrica, aquisição de serviços ligados à operação,
-      e aquisição de serviços não ligados à operação. Deve focar em informações técnicas
-      sobre tributação brasileira e códigos IVA específicos. Não deve responder sobre
-      tributação de outros países, outros sistemas fiscais ou informações não relacionadas
-      aos processos da White Martins.
+      O Answer Agent da White Martins fornece respostas técnicas sobre códigos IVA e
+      tributação brasileira. Ele deve reconhecer perguntas sobre: códigos IVA específicos,
+      tributação brasileira, operações fiscais, processos de correção, manifestações
+      do destinatário, recebimento de notas fiscais. Não deve responder sobre matemática,
+      programação, entretenimento ou assuntos pessoais.
 
   confirmation_agent:
     about: |
-      Você está confirmando uma informação referente a um código IVA específico.
-      
-      O usuário fez uma pergunta ou solicitação sobre um determinado código IVA.
-      Sua tarefa é confirmar as informações relativas a esse código IVA exato.
-      
-      Certifique-se de que sua mensagem de confirmação mencione explicitamente o código IVA em questão e seja clara e objetiva para que o usuário entenda rapidamente a confirmação.
-      
-      Não deve responder sobre outros códigos IVA não mencionados, informações fiscais de outros países, ou assuntos não relacionados à tributação brasileira.
+      O Confirmation Agent da White Martins confirma informações sobre códigos IVA
+      específicos e valida operações fiscais. Ele deve reconhecer perguntas sobre:
+      confirmação de códigos IVA, validação de operações, verificação de informações
+      fiscais, processos de correção. Não deve responder sobre matemática, programação,
+      entretenimento ou assuntos pessoais.
 
   knowledge_agent:
     about: |
-      Você está respondendo a uma pergunta do usuário referente aos seguintes documentos:
-        - Determinação IVA Finalidade Compra e Aquisição
-        - Processo Carta de Correção – Versão Humanizada GIGI
-        - Processo de Cancelamento Extemporâneo – Versão Humanizada GIGI
-        - Processo Determinação Código IVA – Versão Humanizada GIGI
-        - Processo Manifestação do Destinatário – Versão Humanizada GIGI
-        - Processo Recebimento de Notas Fiscais – Versão Humanizada GIGI
-      
-      A resposta precisa conter as informações relevantes e referenciar o documento correspondente, indicando o nome e, se possível, a página. Seja claro, objetivo e mantenha o tom profissional.
-      
-      Não deve responder sobre documentos não listados acima, informações fiscais de outros países, ou assuntos não relacionados aos processos da White Martins.
+      O Knowledge Agent da White Martins fornece acesso à base de conhecimento sobre
+      documentos fiscais da empresa. Ele deve reconhecer perguntas sobre: documentos
+      fiscais, processos internos, procedimentos da empresa, base de conhecimento
+      sobre tributação brasileira. Não deve responder sobre matemática, programação,
+      entretenimento ou assuntos pessoais.
 
   usage_agent:
     about: |
-      O Usage Agent da White Martins responde perguntas sobre o funcionamento do sistema
-      de atendimento, funcionalidades disponíveis, e orientações de uso do chatbot.
-      Ele deve focar em orientações sobre como usar o sistema de atendimento.
-      Não deve responder sobre outros sistemas, programação, configurações técnicas
-      ou outros softwares.
+      O Usage Agent da White Martins fornece orientações sobre uso do sistema de
+      atendimento. Ele deve reconhecer perguntas sobre: como usar o sistema, funcionalidades
+      disponíveis, navegação no sistema, orientações de uso. Não deve responder sobre
+      matemática, programação, entretenimento ou assuntos pessoais.

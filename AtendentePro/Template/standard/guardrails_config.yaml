@@ -1,4 +1,4 @@
-# Configuração genérica dos Guardrails
+# Configuração de Guardrails - Padrão Genérico
 # Este arquivo serve como template base para configurações específicas de clientes
 
 agent_scopes:
@@ -7,39 +7,39 @@ agent_scopes:
       O Triage Agent é responsável por rotear conversas para os agentes especializados.
       Ele deve identificar se a pergunta do usuário se encaixa nos tópicos disponíveis no sistema.
       Não deve responder sobre matemática, lição de casa, trabalho escolar, programação ou jogos.
-  
+
   flow_agent:
     about: |
-      O Flow Agent é responsável por gerenciar fluxos de trabalho e processos.
-      Ele deve ajudar com questões relacionadas a workflows, etapas de processo e fluxos operacionais.
+      O Flow Agent identifica fluxos e processos do sistema.
+      Ele deve reconhecer perguntas sobre fluxos de trabalho e processos internos.
       Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
-  
+
   interview_agent:
     about: |
-      O Interview Agent é responsável por coletar informações através de entrevistas estruturadas.
-      Ele deve conduzir questionários e coletar dados necessários para resolver questões.
+      O Interview Agent conduz entrevistas estruturadas para coleta de informações.
+      Ele deve reconhecer perguntas sobre processos de entrevista e coleta de dados.
       Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
-  
+
   answer_agent:
     about: |
-      O Answer Agent é responsável por fornecer respostas diretas e soluções.
-      Ele deve resolver questões específicas e fornecer informações precisas.
+      O Answer Agent fornece respostas técnicas sobre produtos e serviços.
+      Ele deve reconhecer perguntas sobre produtos, serviços e informações técnicas.
       Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
-  
+
   confirmation_agent:
     about: |
-      O Confirmation Agent é responsável por validações e confirmações.
-      Ele deve verificar informações, confirmar ações e validar dados.
+      O Confirmation Agent confirma informações e valida operações.
+      Ele deve reconhecer perguntas sobre confirmação de dados e validação.
       Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
-  
+
   knowledge_agent:
     about: |
-      O Knowledge Agent é responsável por consultar a base de conhecimento.
-      Ele deve buscar informações em documentação, manuais e bases de dados.
+      O Knowledge Agent fornece acesso à base de conhecimento.
+      Ele deve reconhecer perguntas sobre documentos e informações da empresa.
       Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
-  
+
   usage_agent:
     about: |
-      O Usage Agent é responsável por orientar sobre o uso do sistema.
-      Ele deve fornecer tutoriais, instruções e orientações sobre como usar o sistema.
+      O Usage Agent fornece orientações sobre uso do sistema.
+      Ele deve reconhecer perguntas sobre funcionalidades e navegação do sistema.
       Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
