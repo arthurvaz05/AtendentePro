@@ -2,16 +2,12 @@
 try:
     from .triage_models import (
         get_triage_about_template,
-        get_triage_keywords,
-        get_routing_rules,
         build_route_module
     )
 except ImportError:
     # Fallback para execução direta
     from triage_models import (
         get_triage_about_template,
-        get_triage_keywords,
-        get_routing_rules,
         build_route_module
     )
 

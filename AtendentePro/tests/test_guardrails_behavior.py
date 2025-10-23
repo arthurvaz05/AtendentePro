@@ -7,7 +7,7 @@ Simula o comportamento observado no teste manual
 import unittest
 import os
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 # Adiciona o diretório raiz ao path para importar módulos
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))

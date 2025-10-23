@@ -10,7 +10,7 @@ from typing import Dict, Any, Optional
 triage_keywords_map = {}
 triage_keywords_text = ""
 
-def format_triage_keywords(prefix: str = "-") -> str:
+def format_triage_keywords() -> str:
     """Função mantida para compatibilidade, retorna string vazia"""
     return ""
 
