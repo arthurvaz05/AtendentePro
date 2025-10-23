@@ -186,10 +186,64 @@ AÇÃO: [continue/redirect/refuse]
 # Função de conveniência para uso com agentes
 def get_guardrails_for_agent(agent_name: str):
     """
-    Retorna lista vazia de guardrails para compatibilidade com agentes existentes.
-    O sistema de guardrails será integrado posteriormente.
+    Retorna lista de guardrails para o agente especificado.
+    Integra o sistema de guardrails com os agentes OpenAI.
     """
-    return []
+    from agents import input_guardrail, GuardrailFunctionOutput, RunContextWrapper, Agent, TResponseInputItem
+    
+    @input_guardrail
+    async def guardrail_function(
+        context: RunContextWrapper, 
+        agent: Agent, 
+        input: str | list[TResponseInputItem]
+    ) -> GuardrailFunctionOutput:
+        """
+        Função de guardrail que será chamada pelo agente OpenAI.
+        Retorna GuardrailFunctionOutput indicando se deve bloquear a mensagem.
+        """
+        try:
+            # Extrair mensagem do input
+            if isinstance(input, str):
+                message = input
+            elif isinstance(input, list) and len(input) > 0:
+                # Pegar a última mensagem do usuário
+                user_messages = [item for item in input if item.get("role") == "user"]
+                if user_messages:
+                    message = user_messages[-1].get("content", "")
+                else:
+                    message = ""
+            else:
+                message = ""
+            
+            if not message:
+                return GuardrailFunctionOutput(
+                    output_info={"reasoning": "Mensagem vazia", "is_in_scope": True},
+                    tripwire_triggered=False
+                )
+            
+            # Usar o sistema de guardrails
+            guardrail_system = GuardrailSystem()
+            result = await guardrail_system.evaluate_message(message, agent_name)
+            
+            return GuardrailFunctionOutput(
+                output_info={
+                    "reasoning": result.reasoning,
+                    "is_in_scope": result.is_in_scope,
+                    "confidence": result.confidence,
+                    "suggested_action": result.suggested_action
+                },
+                tripwire_triggered=not result.is_in_scope
+            )
+            
+        except Exception as e:
+            # Em caso de erro, permitir a mensagem (fail-open)
+            print(f"Erro no guardrail para {agent_name}: {e}")
+            return GuardrailFunctionOutput(
+                output_info={"reasoning": f"Erro: {str(e)}", "is_in_scope": True},
+                tripwire_triggered=False
+            )
+    
+    return [guardrail_function]
 
 
 # Função de conveniência para uso direto
