@@ -23,5 +23,5 @@ flow_agent = Agent[ContextNote](
     ),
     handoffs=[],  # Será configurado pelo agent_network.py
     # output_type=FlowOutput,
-    input_guardrails=get_guardrails_for_agent("Flow Agent"),
+    input_guardrails=get_guardrails_for_agent("flow_agent"),
 )

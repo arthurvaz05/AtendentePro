@@ -46,6 +46,7 @@ from AtendentePro.utils.openai_client import get_async_client
 
 if __package__:
     from ..context import ContextNote  # type: ignore
+    from ..guardrails import get_guardrails_for_agent  # type: ignore
     from .knowledge_prompts import prompts_knowledge_agent  # type: ignore
 else:  # pragma: no cover - running as a standalone script
     from context import ContextNote  # type: ignore
@@ -206,4 +207,5 @@ knowledge_agent = Agent[ContextNote](  # type: ignore[name-defined]
         f"{prompts_knowledge_agent}"
     ),
     tools=[go_to_rag],
+    input_guardrails=get_guardrails_for_agent("knowledge_agent"),
 )

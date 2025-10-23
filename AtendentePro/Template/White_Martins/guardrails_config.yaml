@@ -1,392 +1,79 @@
 # Configuração de Guardrails para White Martins
-# Específico para domínio tributário e IVA
+# Informações específicas sobre os agentes para o cliente White Martins
 
-# Palavras sensíveis específicas do domínio tributário
-sensitive_words:
-  # Segurança geral
-  - "password"
-  - "senha" 
-  - "token"
-  - "key"
-  - "secret"
-  - "hack"
-  - "exploit"
-  - "malware"
-  - "virus"
-  
-  # Domínio específico - Tributário/IVA
-  - "fraude"
-  - "sonegação"
-  - "evasão"
-  - "ilegal"
-  - "manipulação"
-  - "corrupção"
-  - "suborno"
-  - "lavagem"
-  - "contrabando"
-  
-  # Palavras ofensivas
-  - "idiota"
-  - "burro"
-  - "estúpido"
-  - "imbecil"
-  - "merda"
-  - "porra"
-  - "caralho"
-  - "foda"
+agent_scopes:
+  triage_agent:
+    about: |
+      O Triage Agent da White Martins é responsável por identificar e direcionar 
+      consultas relacionadas à determinação de códigos IVA e processos fiscais.
+      Ele deve reconhecer perguntas sobre: tipos de operações comerciais (industrialização,
+      comercialização, ativo operacional, consumo, serviços, energia, frete), tributação
+      brasileira, códigos IVA, processos de correção fiscal, cancelamentos, manifestações
+      do destinatário, e recebimento de notas fiscais. Não deve responder sobre matemática,
+      programação, entretenimento, jogos, tributação de outros países, outros sistemas
+      fiscais ou assuntos pessoais.
 
-# Tópicos permitidos (relacionados ao negócio da White Martins)
-on_topic_keywords:
-  # Domínio principal - Tributário e IVA
-  - "iva"
-  - "código"
-  - "códigos"
-  - "tributário"
-  - "tributação"
-  - "imposto"
-  - "impostos"
-  - "fiscal"
-  - "fiscalização"
-  - "nota fiscal"
-  - "nf"
-  - "nfe"
-  - "nfce"
-  - "icms"
-  - "ipi"
-  - "pis"
-  - "cofins"
-  - "simples nacional"
-  - "microempresa"
-  - "substituição tributária"
-  - "st"
-  
-  # Tipos de compra e operações
-  - "compra"
-  - "compras"
-  - "industrialização"
-  - "industrial"
-  - "produção"
-  - "manufaturado"
-  - "comercialização"
-  - "comercial"
-  - "revenda"
-  - "ativo operacional"
-  - "ativo projeto"
-  - "máquina"
-  - "equipamento"
-  - "cilindro"
-  - "consumo administrativo"
-  - "administrativo"
-  - "escritório"
-  - "limpeza"
-  - "ti"
-  - "frete"
-  - "transporte"
-  - "logística"
-  - "energia elétrica"
-  - "energia"
-  - "elétrica"
-  - "eletricidade"
-  - "serviço operação"
-  - "serviço não operação"
-  - "manutenção"
-  - "assistência"
-  - "engenharia"
-  - "consultoria"
-  - "auditoria"
-  - "inspeção"
-  
-  # Fornecedores e clientes
-  - "fornecedor"
-  - "fornecedores"
-  - "cliente"
-  - "clientes"
-  - "empresa"
-  - "empresas"
-  - "cnpj"
-  - "cpf"
-  - "pessoa física"
-  - "pessoa jurídica"
-  - "jurídica"
-  
-  # Processos e procedimentos
-  - "processo"
-  - "procedimento"
-  - "documentação"
-  - "documento"
-  - "documentos"
-  - "análise"
-  - "análises"
-  - "consulta"
-  - "consultas"
-  - "orientação"
-  - "orientações"
-  - "suporte"
-  - "atendimento"
-  - "assistência"
-  - "ajuda"
-  
-  # White Martins específico
-  - "white martins"
-  - "white"
-  - "martins"
-  - "gás"
-  - "gases"
-  - "oxigênio"
-  - "nitrogênio"
-  - "argônio"
-  - "hidrogênio"
-  - "hélio"
-  - "acetileno"
-  - "co2"
-  - "dióxido de carbono"
-  - "soldagem"
-  - "corte"
-  - "laboratório"
-  - "industrial"
-  - "hospitalar"
-  - "alimentício"
-  - "bebida"
-  - "refrigeração"
-  - "ar condicionado"
-  - "caldeira"
-  - "forno"
-  - "queima"
-  - "combustão"
-  
-  # Produtos e serviços
-  - "produto"
-  - "produtos"
-  - "serviço"
-  - "serviços"
-  - "solução"
-  - "soluções"
-  - "equipamento"
-  - "equipamentos"
-  - "instalação"
-  - "instalações"
-  - "manutenção"
-  - "calibração"
-  - "teste"
-  - "testes"
-  - "qualidade"
-  - "certificação"
-  - "certificações"
-  
-  # Termos técnicos e operacionais
-  - "pressão"
-  - "temperatura"
-  - "volume"
-  - "fluxo"
-  - "vazão"
-  - "pureza"
-  - "concentração"
-  - "densidade"
-  - "viscosidade"
-  - "condutividade"
-  - "ph"
-  - "umidade"
-  - "ponto de orvalho"
-  - "ponto de ebulição"
-  - "ponto de fusão"
-  - "estado físico"
-  - "líquido"
-  - "gasoso"
-  - "sólido"
-  - "vapor"
-  
-  # Aplicações e usos
-  - "aplicação"
-  - "aplicações"
-  - "uso"
-  - "usos"
-  - "utilização"
-  - "finalidade"
-  - "objetivo"
-  - "necessidade"
-  - "requisito"
-  - "requisitos"
-  - "especificação"
-  - "especificações"
-  - "norma"
-  - "normas"
-  - "padrão"
-  - "padrões"
-  - "regulamentação"
-  - "legislação"
-  - "lei"
-  - "decreto"
-  - "portaria"
-  - "resolução"
+  flow_agent:
+    about: |
+      O Flow Agent da White Martins identifica e categoriza diferentes tipos de operações
+      fiscais e comerciais. Ele deve reconhecer e direcionar consultas sobre: compra para
+      industrialização, compra para comercialização, compra de ativo operacional, compra de
+      ativo de projeto, consumo administrativo e ativo não operacional, aquisição de frete,
+      aquisição de energia elétrica, aquisição de serviços ligados à operação, e aquisição
+      de serviços não ligados à operação. Não deve responder sobre outros tipos de operações
+      não listadas ou assuntos não relacionados à tributação e processos fiscais.
 
-# Padrões suspeitos de código malicioso
-suspicious_patterns:
-  - "delete\\s+.*"
-  - "drop\\s+.*"
-  - "exec\\s+.*"
-  - "eval\\s+.*"
-  - "system\\s+.*"
-  - "rm\\s+.*"
-  - "format\\s+.*"
+  interview_agent:
+    about: |
+      O Interview Agent da White Martins conduz entrevistas estruturadas para determinar
+      códigos IVA corretos para diferentes tipos de compras e aquisições. Ele deve coletar
+      informações sobre: tipo de operação (industrialização, comercialização, ativo operacional,
+      consumo, serviços, energia, frete), status do fornecedor (Simples Nacional), impostos
+      destacados, e características específicas da operação. Não deve coletar informações
+      pessoais confidenciais, dados de concorrentes ou informações não relacionadas à
+      determinação fiscal.
 
-# Estrutura de tópicos e códigos IVA válidos (White Martins)
-topics:
-  compra_industrializacao:
-    description: "Compra para industrialização — material manufaturado ou processo produtivo"
-    codes:
-      - "I0"
-      - "ID"
-      - "IE"
-      - "I8"
-      - "I5"
-      - "I9"
-      - "I2"
-      - "I7"
-      - "I1"
-      - "I3"
-      - "I4"
-  compra_comercializacao:
-    description: "Compra para comercialização — produto para revenda sem alteração"
-    codes:
-      - "R0"
-      - "ID"
-      - "R6"
-      - "R1"
-      - "R5"
-      - "R3"
-      - "R2"
-      - "R4"
-  compra_ativo_operacional:
-    description: "Compra de ativo operacional — máquinas, equipamentos, cilindros (CIAP imediato)"
-    codes:
-      - "C0"
-      - "C6"
-      - "CA"
-      - "CI"
-      - "CB"
-      - "CD"
-  compra_ativo_projeto:
-    description: "Compra de ativo de projeto — ativos em andamento (CIAP após conclusão)"
-    codes:
-      - "C0"
-      - "C6"
-      - "CE"
-      - "CH"
-      - "CF"
-      - "CG"
-  consumo_administrativo_ativo_nao_operacional:
-    description: "Consumo administrativo e ativo não operacional — escritório, limpeza, mesas, TI"
-    codes:
-      - "C0"
-      - "C6"
-      - "C1"
-      - "C5"
-      - "C3"
-      - "C8"
-      - "C9"
-  aquisicao_frete:
-    description: "Aquisição de frete — serviços de transporte"
-    codes:
-      - "F0"
-      - "F1"
-      - "F5"
-      - "FE"
-      - "FA"
-      - "F2"
-      - "FC"
-      - "F7"
-      - "F3"
-      - "FD"
-      - "FB"
-      - "F4"
-  aquisicao_energia_eletrica:
-    description: "Aquisição de energia elétrica — produtiva vs administrativa"
-    codes:
-      - "E1"
-      - "E2"
-      - "E3"
-      - "E4"
-      - "E0"
-  aquisicao_servicos_ligados_a_operacao:
-    description: "Aquisição de serviços ligados à operação — manutenção, assistência técnica, engenharia"
-    codes:
-      - "YE"
-      - "YH"
-      - "YC"
-      - "YB"
-  aquisicao_servicos_nao_ligados_a_operacao:
-    description: "Aquisição de serviços não ligados à operação — consultorias, auditorias, inspeções"
-    codes:
-      - "YD"
-      - "YA"
-      - "YG"
-      - "YF"
+  answer_agent:
+    about: |
+      O Answer Agent da White Martins fornece respostas técnicas precisas sobre códigos IVA
+      e tributação para diferentes tipos de operações comerciais. Ele deve responder sobre:
+      compra para industrialização, compra para comercialização, compra de ativo operacional,
+      compra de ativo de projeto, consumo administrativo e ativo não operacional, aquisição
+      de frete, aquisição de energia elétrica, aquisição de serviços ligados à operação,
+      e aquisição de serviços não ligados à operação. Deve focar em informações técnicas
+      sobre tributação brasileira e códigos IVA específicos. Não deve responder sobre
+      tributação de outros países, outros sistemas fiscais ou informações não relacionadas
+      aos processos da White Martins.
 
-# Lista consolidada de todos os códigos válidos (para compatibilidade)
-valid_codes:
-  - "I0"
-  - "ID"
-  - "IE"
-  - "I8"
-  - "I5"
-  - "I9"
-  - "I2"
-  - "I7"
-  - "I1"
-  - "I3"
-  - "I4"
-  - "R0"
-  - "R6"
-  - "R1"
-  - "R5"
-  - "R3"
-  - "R2"
-  - "R4"
-  - "C0"
-  - "C6"
-  - "CA"
-  - "CI"
-  - "CB"
-  - "CD"
-  - "CE"
-  - "CH"
-  - "CF"
-  - "CG"
-  - "C1"
-  - "C5"
-  - "C3"
-  - "C8"
-  - "C9"
-  - "F0"
-  - "F1"
-  - "F5"
-  - "FE"
-  - "FA"
-  - "F2"
-  - "FC"
-  - "F7"
-  - "F3"
-  - "FD"
-  - "FB"
-  - "F4"
-  - "E1"
-  - "E2"
-  - "E3"
-  - "E4"
-  - "E0"
-  - "YE"
-  - "YH"
-  - "YC"
-  - "YB"
-  - "YD"
-  - "YA"
-  - "YG"
-  - "YF"
+  confirmation_agent:
+    about: |
+      Você está confirmando uma informação referente a um código IVA específico.
+      
+      O usuário fez uma pergunta ou solicitação sobre um determinado código IVA.
+      Sua tarefa é confirmar as informações relativas a esse código IVA exato.
+      
+      Certifique-se de que sua mensagem de confirmação mencione explicitamente o código IVA em questão e seja clara e objetiva para que o usuário entenda rapidamente a confirmação.
+      
+      Não deve responder sobre outros códigos IVA não mencionados, informações fiscais de outros países, ou assuntos não relacionados à tributação brasileira.
 
-# Configurações de spam
-min_message_length: 3
+  knowledge_agent:
+    about: |
+      Você está respondendo a uma pergunta do usuário referente aos seguintes documentos:
+        - Determinação IVA Finalidade Compra e Aquisição
+        - Processo Carta de Correção – Versão Humanizada GIGI
+        - Processo de Cancelamento Extemporâneo – Versão Humanizada GIGI
+        - Processo Determinação Código IVA – Versão Humanizada GIGI
+        - Processo Manifestação do Destinatário – Versão Humanizada GIGI
+        - Processo Recebimento de Notas Fiscais – Versão Humanizada GIGI
+      
+      A resposta precisa conter as informações relevantes e referenciar o documento correspondente, indicando o nome e, se possível, a página. Seja claro, objetivo e mantenha o tom profissional.
+      
+      Não deve responder sobre documentos não listados acima, informações fiscais de outros países, ou assuntos não relacionados aos processos da White Martins.
 
-spam_patterns:
-  - "(.)\\1{4,}"  # Repetição excessiva de caracteres
-  - "^[0-9]+$"    # Apenas números
-  - "^[a-zA-Z]{1}$"  # Apenas uma letra
+  usage_agent:
+    about: |
+      O Usage Agent da White Martins responde perguntas sobre o funcionamento do sistema
+      de atendimento, funcionalidades disponíveis, e orientações de uso do chatbot.
+      Ele deve focar em orientações sobre como usar o sistema de atendimento.
+      Não deve responder sobre outros sistemas, programação, configurações técnicas
+      ou outros softwares.

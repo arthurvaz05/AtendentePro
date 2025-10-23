@@ -6,6 +6,7 @@ from AtendentePro import config
 from AtendentePro.Interview.interview_prompts import interview_prompts_agent, interview_template
 from AtendentePro.Interview.interview_models import InterviewOutput
 from AtendentePro.context import ContextNote
+from AtendentePro.guardrails import get_guardrails_for_agent
 
 interview_agent = Agent[ContextNote](
     name="Interview Agent",
@@ -18,4 +19,5 @@ interview_agent = Agent[ContextNote](
     ),
     handoffs=[],
     # output_type=AgentOutputSchema(InterviewOutput, strict_json_schema=False),
+    input_guardrails=get_guardrails_for_agent("interview_agent"),
 )

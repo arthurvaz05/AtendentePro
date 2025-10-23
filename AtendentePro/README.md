@@ -143,13 +143,7 @@ All prompt modules follow a consistent structure:
 
 ### Agent Prompt Modules
 
-#### 1. **Triage Agent Prompts** (`Triage/triage_prompts.py`)
-- **Purpose**: Entry point routing and delegation
-- **Structure**: Simple intro with tool usage instructions
-- **Key Features**: Delegates to appropriate specialized agents
-- **Workflow**: Direct tool-based routing without complex reasoning steps
-
-#### 2. **Flow Agent Prompts** (`Flow/flow_prompts.py`)
+#### 1. **Flow Agent Prompts** (`Flow/flow_prompts.py`)
 - **Purpose**: Intelligent topic identification and automatic handoff
 - **Workflow**: `[READ] → [SUMMARY] → [ANALYZE] → [QUESTION] → [VERIFY] → [REVIEW] → [OUTPUT]`
 - **Key Features**:
@@ -161,7 +155,7 @@ All prompt modules follow a consistent structure:
   - **No Structured Output**: Focuses on handoff rather than producing structured data
 - **Behavior**: Direct handoff to Interview Agent without producing FlowOutput
 
-#### 3. **Interview Agent Prompts** (`Interview/interview_prompts.py`)
+#### 2. **Interview Agent Prompts** (`Interview/interview_prompts.py`)
 - **Purpose**: Structured data collection through guided questions
 - **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ANALYZE] → [ROUTE] → [QUESTIONS] → [VERIFY] → [REVIEW] → [OUTPUT INSTRUCTIONS]`
 - **Key Features**:
@@ -172,7 +166,7 @@ All prompt modules follow a consistent structure:
   - **User Interaction**: Waits for user responses before proceeding
 - **Important**: Does NOT auto-fill output; requires user interaction first
 
-#### 4. **Answer Agent Prompts** (`Answer/answer_prompts.py`)
+#### 3. **Answer Agent Prompts** (`Answer/answer_prompts.py`)
 - **Purpose**: Generate final recommendations using templates
 - **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [ANALYZE] → [ROUTE] → [VERIFY] → [REVIEW] → [FORMAT] → [OUTPUT]`
 - **Key Features**:
@@ -182,7 +176,7 @@ All prompt modules follow a consistent structure:
   - **Validation**: Validates against template requirements
 - **Output**: Structured answer with topic-specific information
 
-#### 5. **Confirmation Agent Prompts** (`Confirmation/confirmation_prompts.py`)
+#### 4. **Confirmation Agent Prompts** (`Confirmation/confirmation_prompts.py`)
 - **Purpose**: Validate requests and confirm information
 - **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [CLARIFY] → [CONFIRMATION] → [REVIEW] → [FORMAT] → [ROLLBACK] → [OUTPUT]`
 - **Key Features**:
@@ -191,7 +185,7 @@ All prompt modules follow a consistent structure:
   - References `confirmation_about` for scope definition
   - Falls back to Triage for unrelated topics
 
-#### 6. **Knowledge Agent Prompts** (`Knowledge/knowledge_prompts.py`)
+#### 5. **Knowledge Agent Prompts** (`Knowledge/knowledge_prompts.py`)
 - **Purpose**: RAG-based document retrieval and response
 - **Workflow**: `[READ] → [SUMMARY] → [EXTRACT] → [CLARIFY] → [METADATA_DOCUMENTOS] → [RAG] → [REVIEW] → [FORMAT] → [ROLLBACK] → [OUTPUT]`
 - **Key Features**:
@@ -259,272 +253,181 @@ This architecture ensures consistent behavior while allowing client-specific cus
 
 ---
 
-## Input Guardrails System
+## Sistema de Guardrails
 
-AtendentePro includes a comprehensive, **generic and configurable** input guardrail system that monitors and validates user inputs in real-time, providing security and ensuring appropriate usage across different clients and domains.
+O AtendentePro inclui um sistema inteligente de guardrails que utiliza chatcompletion para avaliar se mensagens dos usuários estão de acordo com o escopo dos agentes. O sistema é genérico e reutilizável, com configurações específicas para cada cliente.
 
-### 🏗️ **Architecture Overview**
-
-The guardrail system is designed with **client-specific configurations** that can be easily customized for different businesses:
+### 🏗️ Arquitetura do Sistema de Guardrails
 
 ```
 AtendentePro/
-├── guardrails.py                    # Generic guardrail functions
-├── Template/
-│   ├── White_Martins/               # Client-specific configs
-│   │   ├── guardrails_config.yaml   # Guardrail rules & topics
-│   │   └── agent_guardrails_config.yaml # Agent-to-guardrail mapping
-│   └── EasyDr/                      # Another client example
-│       └── guardrails_config.yaml
+├── guardrails.py                    # Sistema genérico de guardrails
+├── guardrails_config_default.yaml   # Configuração genérica (fallback)
+├── utils/
+│   └── guardrails_integration.py   # Utilitários de integração
+├── tests/
+│   └── test_guardrails_out_of_scope.py  # Testes do sistema
+└── Template/
+    └── White_Martins/
+        └── guardrails_config.yaml   # Configuração específica White Martins
 ```
 
-### 🔧 **Generic Guardrail Functions**
+### Componentes Principais
 
-#### 1. **Content Security** (`reject_sensitive_content`)
-- **Purpose**: Blocks sensitive words and suspicious patterns
-- **Configuration**: Loads sensitive words from client YAML
-- **Protects Against**: Passwords, hacking attempts, malicious code, domain-specific fraud
+1. **GuardrailSystem**: Sistema principal que avalia mensagens usando chatcompletion
+2. **GuardrailConfig**: Carrega e gerencia configurações YAML
+3. **GuardrailOutput**: Modelo de resposta padronizado com reasoning, confidence e suggested_action
+4. **GuardrailIntegration**: Wrapper para integração fácil com agentes existentes
 
-#### 2. **Topic Validation** (`reject_off_topic_queries`)
-- **Purpose**: Ensures queries stay within business scope
-- **Configuration**: Loads **on_topic_keywords** from client YAML (NEW APPROACH)
-- **Logic**: **Permits queries that contain at least one allowed keyword** (instead of blocking forbidden ones)
-- **Agent-Specific**: **Each agent has its own on_topic_keywords based on its prompts** (NEW FEATURE)
-- **Benefits**: 
-  - ✅ **Easier to maintain**: Define what's allowed rather than what's forbidden
-  - ✅ **More comprehensive**: Covers all business domains without exhaustive exclusion lists
-  - ✅ **Client-specific**: Each client defines their own allowed topics
-  - ✅ **Agent-specific**: Each agent has tailored topics based on its role and prompts
-- **Example**: "Qual o código IVA para energia elétrica?" → ✅ **Allowed** (contains "iva", "código", "energia elétrica")
-- **Example**: "Quem descobriu o Brasil?" → ❌ **Blocked** (no allowed keywords found)
-- **Agent Examples**:
-  - **Flow Agent**: Allows "duvida iva", "qual iva" (specific to flow identification)
-  - **Confirmation Agent**: Allows "confirmar", "validação" (specific to confirmation tasks)
-  - **Knowledge Agent**: Allows "procedimento", "documentação" (specific to knowledge retrieval)
-  - **Usage Agent**: Allows "usar o sistema", "como funciona" (specific to system usage)
+### 🚀 Como Usar
 
-#### 3. **Business Code Validation** (`validate_business_codes`)
-- **Purpose**: Validates business-specific codes (IVA, product codes, etc.)
-- **Configuration**: Loads valid codes from client YAML
-- **Regex Pattern**: `\b([A-Z]\d|[A-Z]{2,3}|\d{2,3})\b`
-- **Blocks**: Invalid or non-existent codes
+#### Uso Básico
 
-#### 4. **Topic & Code Context Validation** (`validate_topic_and_codes`)
-- **Purpose**: Validates codes within specific topic contexts
-- **Configuration**: Loads topics with their associated codes and descriptions
-- **Advanced Logic**: Ensures codes match the context of the conversation
-- **Example**: Code "I0" must be used in "industrialization" context, not "commercialization"
+```python
+from guardrails import GuardrailSystem
 
-#### 5. **Spam Detection** (`detect_spam_patterns`)
-- **Purpose**: Detects spam and repetitive patterns
-- **Configuration**: Configurable minimum length and spam patterns
-- **Blocks**: Excessive character repetition, very short messages
+# Inicializar sistema
+system = GuardrailSystem("Template/White_Martins/guardrails_config.yaml")
 
-### 🛡️ **Educational Messages Approach**
+# Avaliar mensagem
+result = await system.evaluate_message(
+    message="Preciso de uma válvula pneumática",
+    agent_name="triage_agent"
+)
 
-**NEW FEATURE**: Guardrails now return **educational messages** instead of exceptions, providing users with helpful guidance:
-
-#### **Message Examples**:
-
-**Topic Out of Scope**:
-```
-"Desculpe, mas não posso responder sobre esse tema. Meu foco é ajudar com questões relacionadas aos serviços da empresa, como: iva, código, códigos, tributário, tributação. Por favor, reformule sua pergunta sobre um desses tópicos."
+# Verificar resultado
+if result.is_in_scope and result.confidence >= 0.7:
+    print("✅ Processar com agente")
+else:
+    print("❌ Mensagem fora do escopo")
 ```
 
-**Sensitive Content**:
-```
-"Desculpe, mas não posso processar sua solicitação pois contém conteúdo sensível relacionado a 'fraude'. Por favor, reformule sua pergunta de forma mais adequada."
+#### Integração com Agentes
+
+```python
+from utils.guardrails_integration import GuardrailIntegration
+
+# Inicializar integração
+integration = GuardrailIntegration("Template/White_Martins/guardrails_config.yaml")
+
+# Verificar antes de processar
+should_continue, result = await integration.check_before_agent(
+    message="Sua mensagem aqui",
+    agent_name="triage_agent"
+)
+
+if should_continue:
+    # Processar com agente
+    response = await agent.process(message)
+else:
+    # Tratar mensagem fora do escopo
+    response = await integration.handle_out_of_scope(result, agent_name)
 ```
 
-**Invalid Code**:
-```
-"Desculpe, mas o código 'Z9' não é um código IVA válido. Por favor, verifique o código e tente novamente. Se precisar de ajuda com códigos válidos, posso orientá-lo sobre os códigos disponíveis."
-```
+### ⚙️ Configuração
 
-**Short Message**:
-```
-"Desculpe, mas sua mensagem é muito curta. Por favor, forneça mais detalhes (mínimo 3 caracteres) para que eu possa ajudá-lo melhor."
-```
-
-**Agent-Specific Messages**:
-```
-"Desculpe, mas o confirmation não pode responder sobre esse tema. Meu foco é ajudar com questões relacionadas a: confirmar, validação, conferência. Por favor, reformule sua pergunta sobre um desses tópicos."
-```
-
-#### **Benefits**:
-- ✅ **User-Friendly**: No exceptions, only helpful messages
-- ✅ **Educational**: Guides users on how to reformulate queries
-- ✅ **Agent-Specific**: Each agent provides tailored guidance
-- ✅ **Contextual**: Shows relevant examples and suggestions
-- ✅ **Professional**: Maintains polite and helpful tone
-
-### 🎯 **Agent-Specific Guardrail Assignment**
-
-Guardrails are dynamically assigned to agents based on `agent_guardrails_config.yaml`:
+#### Estrutura do arquivo YAML
 
 ```yaml
-# Example configuration with agent-specific topics
-Triage Agent:
-  guardrails:
-    - reject_off_topic_queries
-    - detect_spam_patterns
-  on_topic_keywords:
-    - "iva"
-    - "código"
-    - "tributário"
-    - "energia elétrica"
-    - "confirmar"
-    - "procedimento"
-    - "usar o sistema"
-    # ... (114 total topics - most comprehensive)
-
-Flow Agent:
-  guardrails:
-    - reject_off_topic_queries
-  on_topic_keywords:
-    - "iva"
-    - "duvida iva"        # Specific to Flow
-    - "qual iva"          # Specific to Flow
-    - "código"
-    - "tributário"
-    # ... (58 total topics - focused on IVA identification)
-
-Confirmation Agent:
-  guardrails:
-    - reject_sensitive_content
-  on_topic_keywords:
-    - "confirmar"         # Specific to Confirmation
-    - "validação"         # Specific to Confirmation
-    - "conferência"       # Specific to Confirmation
-    - "iva"
-    - "código"
-    # ... (41 total topics - focused on confirmation tasks)
-
-Knowledge Agent:
-  guardrails:
-    - reject_off_topic_queries
-    - detect_spam_patterns
-  on_topic_keywords:
-    - "procedimento"       # Specific to Knowledge
-    - "documentação"       # Specific to Knowledge
-    - "norma"             # Specific to Knowledge
-    - "determinação iva"
-    - "carta de correção"
-    # ... (37 total topics - focused on procedures)
-
-Usage Agent:
-  guardrails:
-    - detect_spam_patterns
-  on_topic_keywords:
-    - "usar o sistema"    # Specific to Usage
-    - "como funciona"     # Specific to Usage
-    - "ajuda plataforma"  # Specific to Usage
-    - "sistema"
-    - "plataforma"
-    # ... (26 total topics - focused on system usage)
-
-Answer Agent:
-  guardrails:
-    - reject_sensitive_content
-    - validate_topic_and_codes  # Only Answer Agent handles codes
-  on_topic_keywords:
-    - "iva"
-    - "código"
-    - "tributário"
-    # ... (55 total topics - focused on final answers)
+agent_scopes:
+  nome_do_agente:
+    about: |
+      Descrição detalhada do que o agente faz
+      e qual seu escopo de atuação, incluindo
+      o que NÃO deve responder
 ```
 
-### 📋 **Client Configuration Structure**
+#### Configuração White Martins
 
-#### **guardrails_config.yaml**
-```yaml
-# Sensitive words and patterns
-sensitive_words:
-  - "password"
-  - "hack"
-  - "fraud"
+O arquivo `Template/White_Martins/guardrails_config.yaml` contém configurações específicas para:
 
-# On-topic keywords (NEW APPROACH - define what's allowed)
-on_topic_keywords:
-  - "iva"
-  - "código"
-  - "tributário"
-  - "energia elétrica"
-  - "compra"
-  - "industrialização"
-  - "comercialização"
-  # ... etc (much easier to maintain!)
+- **triage_agent**: Roteamento de consultas sobre códigos IVA e processos fiscais
+- **flow_agent**: Identificação de tipos de operações fiscais e comerciais
+- **interview_agent**: Entrevistas estruturadas para determinação de códigos IVA
+- **answer_agent**: Respostas técnicas sobre códigos IVA e tributação brasileira
+- **confirmation_agent**: Confirmação de informações sobre códigos IVA específicos
+- **knowledge_agent**: Base de conhecimento sobre documentos fiscais da empresa
+- **usage_agent**: Orientações sobre uso do sistema de atendimento
 
-# Business topics with codes
-topics:
-  compra_industrializacao:
-    description: "Compra para industrialização"
-    codes: ["I0", "ID", "IE", "I8", "I5", "I9", "I2", "I7", "I1", "I3", "I4"]
-  
-  compra_comercializacao:
-    description: "Compra para comercialização"
-    codes: ["E0", "ED", "EE", "E8", "E5", "E9", "E2", "E7", "E1", "E3", "E4"]
+### 🧪 Testes
 
-# All valid codes (consolidated)
-valid_codes:
-  - "I0"
-  - "ID"
-  - "E0"
-  - "ED"
-  # ... etc
-
-# Spam detection settings
-min_message_length: 3
-spam_patterns: []
-```
-
-### 🧪 **Comprehensive Testing**
-
-The system includes extensive test coverage:
+#### Executar Testes
 
 ```bash
-# Run all guardrail tests
-python AtendentePro/tests/test_guardrails_comprehensive.py
+# Ativar ambiente virtual
+source venv/bin/activate
 
-# Test specific scenarios
-python AtendentePro/tests/test_guardrails_topics.py
-python AtendentePro/tests/test_guardrails_generic.py
+# Executar testes de guardrails
+python AtendentePro/tests/test_guardrails_out_of_scope.py
 ```
 
-**Test Scenarios Covered**:
-- ✅ Valid codes in correct contexts
-- ✅ Valid codes in wrong contexts (blocked)
-- ✅ Invalid/non-existent codes (blocked)
-- ✅ Off-topic queries (blocked)
-- ✅ Sensitive content (blocked)
-- ✅ Spam patterns (blocked)
-- ✅ Mixed valid/invalid scenarios
-- ✅ Edge cases and boundary conditions
+#### Cenários de Teste
 
-### 🚀 **Usage**
+O sistema testa:
+- ✅ Mensagens sobre códigos IVA e processos fiscais (dentro do escopo)
+- ✅ Consultas sobre tipos de operações comerciais (dentro do escopo)
+- ❌ Consultas de matemática (fora do escopo)
+- ❌ Consultas de programação (fora do escopo)
+- ❌ Consultas de entretenimento (fora do escopo)
+- ❌ Consultas sobre concorrentes (fora do escopo)
+- ❌ Assuntos pessoais (fora do escopo)
 
-Guardrails run **automatically** in parallel with agent execution:
+### 📊 Output do Sistema
 
-1. **No Configuration Needed**: Guardrails are integrated into each agent definition
-2. **Dynamic Loading**: Configurations are loaded from client-specific YAML files
-3. **Real-time Validation**: Inputs are validated before agent processing
-4. **Graceful Rejection**: Invalid inputs are blocked with clear error messages
+#### GuardrailOutput
 
-### 🔄 **Multi-Client Support**
+```python
+class GuardrailOutput(BaseModel):
+    reasoning: str        # Explicação detalhada da análise
+    is_in_scope: bool     # Se está no escopo do agente
+    confidence: float     # Confiança da avaliação (0.0-1.0)
+    suggested_action: str # Ação sugerida: continue/redirect/refuse
+```
 
-The system supports multiple clients with different configurations:
+#### Ações Sugeridas
 
-- **White Martins**: IVA codes, energy electricity, industrial/commercial topics
-- **EasyDr**: Medical codes, patient data, healthcare topics
-- **Custom Clients**: Easy to add new client configurations
+- **continue**: Processar normalmente com o agente
+- **redirect**: Redirecionar para outro agente mais apropriado
+- **refuse**: Recusar a consulta por estar fora do escopo
 
-### 🛡️ **Security Features**
+### 🔧 Personalização
 
-- **Regex-based Code Detection**: Sophisticated pattern matching for business codes
-- **Context Validation**: Ensures codes are used in appropriate contexts
-- **Common Word Filtering**: Prevents false positives from common words
-- **Case-insensitive Matching**: Handles various input formats
-- **Configurable Sensitivity**: Adjustable rules per client needs
+#### Para Novos Clientes
+
+1. Criar pasta em `Template/NomeCliente/`
+2. Criar `guardrails_config.yaml` com configurações específicas
+3. Usar o sistema genérico apontando para a configuração específica
+
+#### Ajustar Sensibilidade
+
+```python
+# Limiar de confiança para aceitar mensagem
+confidence_threshold = 0.7  # Padrão: 0.7
+
+should_continue, result = await integration.check_before_agent(
+    message, agent_name, confidence_threshold=0.8
+)
+```
+
+### 🎯 Benefícios do Sistema de Guardrails
+
+- **Simples**: Usa apenas o campo `about` para configuração
+- **Intuitivo**: Descrição natural do escopo do agente
+- **Reutilizável**: Sistema genérico com configurações específicas
+- **Inteligente**: Usa IA para análise contextual
+- **Flexível**: Configurável por cliente e agente
+- **Robusto**: Fallback para configuração genérica
+- **Testável**: Suite de testes incluída
+
+### 🔍 Monitoramento
+
+O sistema fornece:
+- Razão detalhada da análise
+- Nível de confiança
+- Ação sugerida
+- Logs de erros quando necessário
+
+Isso permite monitorar e ajustar o comportamento do sistema conforme necessário.
 
 ---
 
@@ -546,3 +449,9 @@ This repository includes a `.vscode/launch.json` with two helpful configurations
 - "Run AtendentePro (choose agent)": Launch the main CLI runner module `AtendentePro.run_env.run` and pick which agent to start (triage, flow, interview, answer, confirmation, knowledge, usage).
 
 To use: open the file you want to debug, then select the "Python: Debug Current File" configuration and start the debugger. Or choose the second configuration and select the agent using the prompt.
+### Testes de Guardrails
+
+```bash
+# Testes de guardrails
+python AtendentePro/tests/test_guardrails_out_of_scope.py
+```

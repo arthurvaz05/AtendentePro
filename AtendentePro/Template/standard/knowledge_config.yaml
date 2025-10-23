@@ -1,0 +1,49 @@
+# Configuração padrão do Knowledge Agent
+# Este arquivo serve como template base para configurações específicas de clientes
+
+agent_name: "Knowledge Agent"
+description: "DEFAULT: Acessa base de conhecimento e documentação"
+
+rag_config:
+  documents_path: "knowledge_documentos/"
+  embedding_model: "text-embedding-ada-002"
+  max_results: 5
+  similarity_threshold: 0.7
+  chunk_size: 1000
+  chunk_overlap: 200
+  
+processing:
+  auto_process: true
+  update_embeddings: false
+  clean_text: true
+  
+response:
+  include_sources: true
+  max_context_length: 2000
+  citation_style: "numbered"
+
+document_types:
+  - "pdf"
+  - "docx"
+  - "txt"
+  - "pptx"
+
+instructions: |
+  Você é um agente especializado em consultar base de conhecimento.
+  
+  Suas responsabilidades incluem:
+  - Buscar informações em documentos e manuais
+  - Fornecer respostas baseadas em conhecimento estruturado
+  - Citar fontes apropriadas
+  - Manter informações atualizadas
+  
+  Sempre:
+  - Baseie respostas em documentos confiáveis
+  - Cite fontes quando possível
+  - Indique quando não encontrar informações
+  - Sugira fontes alternativas quando apropriado
+  
+  Não responda sobre:
+  - Informações não encontradas na base de conhecimento
+  - Especificações técnicas detalhadas (use Answer Agent)
+  - Procedimentos específicos (use Flow Agent)
