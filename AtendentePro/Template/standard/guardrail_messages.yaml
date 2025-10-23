@@ -1,0 +1,33 @@
+# Mensagens de Guardrails - Padrão Genérico
+# Este arquivo serve como template base para configurações específicas de clientes
+
+guardrail_messages:
+  out_of_scope:
+    title: "🚫 Pergunta fora do escopo"
+    message: |
+      Desculpe, mas sua pergunta está fora do escopo dos serviços que posso oferecer.
+      
+      💡 Posso ajudar apenas com questões relacionadas aos nossos serviços especializados.
+      
+      ❓ Tente fazer uma pergunta sobre nossos produtos e serviços.
+      
+      Como posso ajudá-lo?
+    
+    short_message: "Desculpe, só posso ajudar com questões relacionadas aos nossos serviços."
+  
+  error_fallback:
+    title: "⚠️ Erro no sistema"
+    message: |
+      Ocorreu um erro técnico ao processar sua pergunta.
+      
+      Por favor, tente novamente ou reformule sua pergunta sobre nossos serviços.
+      
+      Se o problema persistir, entre em contato com nosso suporte técnico.
+    
+    short_message: "Erro técnico. Tente novamente com uma pergunta sobre nossos serviços."
+
+# Configurações gerais
+settings:
+  show_detailed_message: true  # Mostrar mensagem completa ou apenas resumida
+  include_suggestions: true     # Incluir sugestões de tópicos
+  add_to_conversation: true     # Adicionar resposta ao histórico da conversa
