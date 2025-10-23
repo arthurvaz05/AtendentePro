@@ -287,21 +287,8 @@ AtendentePro/
 
 #### 2. **Topic Validation** (`reject_off_topic_queries`)
 - **Purpose**: Ensures queries stay within business scope
-- **Configuration**: Loads **on_topic_keywords** from client YAML (NEW APPROACH)
-- **Logic**: **Permits queries that contain at least one allowed keyword** (instead of blocking forbidden ones)
-- **Agent-Specific**: **Each agent has its own on_topic_keywords based on its prompts** (NEW FEATURE)
-- **Benefits**: 
-  - ✅ **Easier to maintain**: Define what's allowed rather than what's forbidden
-  - ✅ **More comprehensive**: Covers all business domains without exhaustive exclusion lists
-  - ✅ **Client-specific**: Each client defines their own allowed topics
-  - ✅ **Agent-specific**: Each agent has tailored topics based on its role and prompts
-- **Example**: "Qual o código IVA para energia elétrica?" → ✅ **Allowed** (contains "iva", "código", "energia elétrica")
-- **Example**: "Quem descobriu o Brasil?" → ❌ **Blocked** (no allowed keywords found)
-- **Agent Examples**:
-  - **Flow Agent**: Allows "duvida iva", "qual iva" (specific to flow identification)
-  - **Confirmation Agent**: Allows "confirmar", "validação" (specific to confirmation tasks)
-  - **Knowledge Agent**: Allows "procedimento", "documentação" (specific to knowledge retrieval)
-  - **Usage Agent**: Allows "usar o sistema", "como funciona" (specific to system usage)
+- **Configuration**: Loads off-topic keywords from client YAML
+- **Blocks**: Cryptocurrency, politics, religion, sports, cooking, etc.
 
 #### 3. **Business Code Validation** (`validate_business_codes`)
 - **Purpose**: Validates business-specific codes (IVA, product codes, etc.)
@@ -320,118 +307,35 @@ AtendentePro/
 - **Configuration**: Configurable minimum length and spam patterns
 - **Blocks**: Excessive character repetition, very short messages
 
-### 🛡️ **Educational Messages Approach**
-
-**NEW FEATURE**: Guardrails now return **educational messages** instead of exceptions, providing users with helpful guidance:
-
-#### **Message Examples**:
-
-**Topic Out of Scope**:
-```
-"Desculpe, mas não posso responder sobre esse tema. Meu foco é ajudar com questões relacionadas aos serviços da empresa, como: iva, código, códigos, tributário, tributação. Por favor, reformule sua pergunta sobre um desses tópicos."
-```
-
-**Sensitive Content**:
-```
-"Desculpe, mas não posso processar sua solicitação pois contém conteúdo sensível relacionado a 'fraude'. Por favor, reformule sua pergunta de forma mais adequada."
-```
-
-**Invalid Code**:
-```
-"Desculpe, mas o código 'Z9' não é um código IVA válido. Por favor, verifique o código e tente novamente. Se precisar de ajuda com códigos válidos, posso orientá-lo sobre os códigos disponíveis."
-```
-
-**Short Message**:
-```
-"Desculpe, mas sua mensagem é muito curta. Por favor, forneça mais detalhes (mínimo 3 caracteres) para que eu possa ajudá-lo melhor."
-```
-
-**Agent-Specific Messages**:
-```
-"Desculpe, mas o confirmation não pode responder sobre esse tema. Meu foco é ajudar com questões relacionadas a: confirmar, validação, conferência. Por favor, reformule sua pergunta sobre um desses tópicos."
-```
-
-#### **Benefits**:
-- ✅ **User-Friendly**: No exceptions, only helpful messages
-- ✅ **Educational**: Guides users on how to reformulate queries
-- ✅ **Agent-Specific**: Each agent provides tailored guidance
-- ✅ **Contextual**: Shows relevant examples and suggestions
-- ✅ **Professional**: Maintains polite and helpful tone
-
 ### 🎯 **Agent-Specific Guardrail Assignment**
 
 Guardrails are dynamically assigned to agents based on `agent_guardrails_config.yaml`:
 
 ```yaml
-# Example configuration with agent-specific topics
+# Example configuration
 Triage Agent:
-  guardrails:
-    - reject_off_topic_queries
-    - detect_spam_patterns
-  on_topic_keywords:
-    - "iva"
-    - "código"
-    - "tributário"
-    - "energia elétrica"
-    - "confirmar"
-    - "procedimento"
-    - "usar o sistema"
-    # ... (114 total topics - most comprehensive)
+  - reject_off_topic_queries
+  - detect_spam_patterns
 
 Flow Agent:
-  guardrails:
-    - reject_off_topic_queries
-  on_topic_keywords:
-    - "iva"
-    - "duvida iva"        # Specific to Flow
-    - "qual iva"          # Specific to Flow
-    - "código"
-    - "tributário"
-    # ... (58 total topics - focused on IVA identification)
+  - reject_off_topic_queries
 
-Confirmation Agent:
-  guardrails:
-    - reject_sensitive_content
-  on_topic_keywords:
-    - "confirmar"         # Specific to Confirmation
-    - "validação"         # Specific to Confirmation
-    - "conferência"       # Specific to Confirmation
-    - "iva"
-    - "código"
-    # ... (41 total topics - focused on confirmation tasks)
-
-Knowledge Agent:
-  guardrails:
-    - reject_off_topic_queries
-    - detect_spam_patterns
-  on_topic_keywords:
-    - "procedimento"       # Specific to Knowledge
-    - "documentação"       # Specific to Knowledge
-    - "norma"             # Specific to Knowledge
-    - "determinação iva"
-    - "carta de correção"
-    # ... (37 total topics - focused on procedures)
-
-Usage Agent:
-  guardrails:
-    - detect_spam_patterns
-  on_topic_keywords:
-    - "usar o sistema"    # Specific to Usage
-    - "como funciona"     # Specific to Usage
-    - "ajuda plataforma"  # Specific to Usage
-    - "sistema"
-    - "plataforma"
-    # ... (26 total topics - focused on system usage)
+Interview Agent:
+  - reject_sensitive_content
 
 Answer Agent:
-  guardrails:
-    - reject_sensitive_content
-    - validate_topic_and_codes  # Only Answer Agent handles codes
-  on_topic_keywords:
-    - "iva"
-    - "código"
-    - "tributário"
-    # ... (55 total topics - focused on final answers)
+  - reject_sensitive_content
+  - validate_topic_and_codes  # Only Answer Agent handles codes
+
+Confirmation Agent:
+  - reject_sensitive_content
+
+Knowledge Agent:
+  - reject_off_topic_queries
+  - detect_spam_patterns
+
+Usage Agent:
+  - detect_spam_patterns
 ```
 
 ### 📋 **Client Configuration Structure**
@@ -444,16 +348,11 @@ sensitive_words:
   - "hack"
   - "fraud"
 
-# On-topic keywords (NEW APPROACH - define what's allowed)
-on_topic_keywords:
-  - "iva"
-  - "código"
-  - "tributário"
-  - "energia elétrica"
-  - "compra"
-  - "industrialização"
-  - "comercialização"
-  # ... etc (much easier to maintain!)
+# Off-topic keywords
+off_topic_keywords:
+  - "bitcoin"
+  - "politics"
+  - "weather"
 
 # Business topics with codes
 topics:

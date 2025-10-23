@@ -1,392 +1,170 @@
-# Configuração de Guardrails para White Martins
-# Específico para domínio tributário e IVA
+# Configuração de Guardrails Especializados - White Martins
+# Sistema ultra-simplificado usando descrições, escopos e tópicos de agentes
+# Toda validação é feita pela IA baseada na descrição, escopo e tópicos
 
-# Palavras sensíveis específicas do domínio tributário
-sensitive_words:
-  # Segurança geral
-  - "password"
-  - "senha" 
-  - "token"
-  - "key"
-  - "secret"
-  - "hack"
-  - "exploit"
-  - "malware"
-  - "virus"
-  
-  # Domínio específico - Tributário/IVA
-  - "fraude"
-  - "sonegação"
-  - "evasão"
-  - "ilegal"
-  - "manipulação"
-  - "corrupção"
-  - "suborno"
-  - "lavagem"
-  - "contrabando"
-  
-  # Palavras ofensivas
-  - "idiota"
-  - "burro"
-  - "estúpido"
-  - "imbecil"
-  - "merda"
-  - "porra"
-  - "caralho"
-  - "foda"
-
-# Tópicos permitidos (relacionados ao negócio da White Martins)
-on_topic_keywords:
-  # Domínio principal - Tributário e IVA
-  - "iva"
-  - "código"
-  - "códigos"
-  - "tributário"
-  - "tributação"
-  - "imposto"
-  - "impostos"
-  - "fiscal"
-  - "fiscalização"
-  - "nota fiscal"
-  - "nf"
-  - "nfe"
-  - "nfce"
-  - "icms"
-  - "ipi"
-  - "pis"
-  - "cofins"
-  - "simples nacional"
-  - "microempresa"
-  - "substituição tributária"
-  - "st"
-  
-  # Tipos de compra e operações
-  - "compra"
-  - "compras"
-  - "industrialização"
-  - "industrial"
-  - "produção"
-  - "manufaturado"
-  - "comercialização"
-  - "comercial"
-  - "revenda"
-  - "ativo operacional"
-  - "ativo projeto"
-  - "máquina"
-  - "equipamento"
-  - "cilindro"
-  - "consumo administrativo"
-  - "administrativo"
-  - "escritório"
-  - "limpeza"
-  - "ti"
-  - "frete"
-  - "transporte"
-  - "logística"
-  - "energia elétrica"
-  - "energia"
-  - "elétrica"
-  - "eletricidade"
-  - "serviço operação"
-  - "serviço não operação"
-  - "manutenção"
-  - "assistência"
-  - "engenharia"
-  - "consultoria"
-  - "auditoria"
-  - "inspeção"
-  
-  # Fornecedores e clientes
-  - "fornecedor"
-  - "fornecedores"
-  - "cliente"
-  - "clientes"
-  - "empresa"
-  - "empresas"
-  - "cnpj"
-  - "cpf"
-  - "pessoa física"
-  - "pessoa jurídica"
-  - "jurídica"
-  
-  # Processos e procedimentos
-  - "processo"
-  - "procedimento"
-  - "documentação"
-  - "documento"
-  - "documentos"
-  - "análise"
-  - "análises"
-  - "consulta"
-  - "consultas"
-  - "orientação"
-  - "orientações"
-  - "suporte"
-  - "atendimento"
-  - "assistência"
-  - "ajuda"
-  
-  # White Martins específico
-  - "white martins"
-  - "white"
-  - "martins"
-  - "gás"
-  - "gases"
-  - "oxigênio"
-  - "nitrogênio"
-  - "argônio"
-  - "hidrogênio"
-  - "hélio"
-  - "acetileno"
-  - "co2"
-  - "dióxido de carbono"
-  - "soldagem"
-  - "corte"
-  - "laboratório"
-  - "industrial"
-  - "hospitalar"
-  - "alimentício"
-  - "bebida"
-  - "refrigeração"
-  - "ar condicionado"
-  - "caldeira"
-  - "forno"
-  - "queima"
-  - "combustão"
-  
-  # Produtos e serviços
-  - "produto"
-  - "produtos"
-  - "serviço"
-  - "serviços"
-  - "solução"
-  - "soluções"
-  - "equipamento"
-  - "equipamentos"
-  - "instalação"
-  - "instalações"
-  - "manutenção"
-  - "calibração"
-  - "teste"
-  - "testes"
-  - "qualidade"
-  - "certificação"
-  - "certificações"
-  
-  # Termos técnicos e operacionais
-  - "pressão"
-  - "temperatura"
-  - "volume"
-  - "fluxo"
-  - "vazão"
-  - "pureza"
-  - "concentração"
-  - "densidade"
-  - "viscosidade"
-  - "condutividade"
-  - "ph"
-  - "umidade"
-  - "ponto de orvalho"
-  - "ponto de ebulição"
-  - "ponto de fusão"
-  - "estado físico"
-  - "líquido"
-  - "gasoso"
-  - "sólido"
-  - "vapor"
-  
-  # Aplicações e usos
-  - "aplicação"
-  - "aplicações"
-  - "uso"
-  - "usos"
-  - "utilização"
-  - "finalidade"
-  - "objetivo"
-  - "necessidade"
-  - "requisito"
-  - "requisitos"
-  - "especificação"
-  - "especificações"
-  - "norma"
-  - "normas"
-  - "padrão"
-  - "padrões"
-  - "regulamentação"
-  - "legislação"
-  - "lei"
-  - "decreto"
-  - "portaria"
-  - "resolução"
-
-# Padrões suspeitos de código malicioso
-suspicious_patterns:
-  - "delete\\s+.*"
-  - "drop\\s+.*"
-  - "exec\\s+.*"
-  - "eval\\s+.*"
-  - "system\\s+.*"
-  - "rm\\s+.*"
-  - "format\\s+.*"
+# Descrições e escopos para cada agente
+agent_scope_descriptions:
+  Triage Agent:
+    description: "Agente de triagem que roteia conversas para agentes especializados. Deve aceitar qualquer pergunta relacionada a serviços da empresa, tributação, IVA, energia elétrica, compras industriais/comerciais, ativos operacionais, frete, serviços operacionais e não-operacionais."
+    scope: "Tributação, IVA, energia elétrica, compras empresariais, ativos, frete, serviços da empresa"
+    
+  Flow Agent:
+    description: "Agente de fluxo que identifica tópicos específicos de tributação e IVA. Deve aceitar perguntas sobre códigos IVA, tipos de compra (industrialização, comercialização), ativos operacionais e de projeto, consumo administrativo, frete, energia elétrica e serviços."
+    scope: "Identificação de tópicos tributários, códigos IVA, tipos de compra empresarial"
+    
+  Interview Agent:
+    description: "Agente de entrevista que coleta informações detalhadas sobre operações tributárias. Deve aceitar perguntas sobre fornecedores, tipos de operação, códigos IVA específicos, contexto de compras e operações empresariais."
+    scope: "Coleta de informações sobre operações tributárias, fornecedores, códigos IVA"
+    
+  Answer Agent:
+    description: "Agente de resposta que fornece informações detalhadas sobre tributação e IVA. Deve aceitar perguntas sobre códigos IVA, tipos de compra, ativos operacionais, consumo administrativo, frete, energia elétrica e serviços operacionais."
+    scope: "Fornecimento de respostas sobre tributação, códigos IVA, tipos de compra empresarial"
+    
+  Confirmation Agent:
+    description: "Agente de confirmação que valida informações sobre operações tributárias. Deve aceitar perguntas sobre confirmação de códigos IVA, tipos de operação, fornecedores e contexto de compras empresariais."
+    scope: "Confirmação de informações tributárias, códigos IVA, operações empresariais"
+    
+  Knowledge Agent:
+    description: "Agente de conhecimento que consulta documentação sobre tributação e IVA. Deve aceitar perguntas sobre consulta de códigos IVA, tipos de compra, ativos operacionais, consumo administrativo, frete, energia elétrica e serviços."
+    scope: "Consulta de documentação tributária, códigos IVA, procedimentos empresariais"
+    
+  Usage Agent:
+    description: "Agente de uso que explica funcionalidades do sistema de atendimento tributário. Deve aceitar perguntas sobre como usar o sistema, navegação, orientações de uso e ajuda técnica relacionada ao sistema."
+    scope: "Funcionalidades do sistema, orientações de uso, navegação, ajuda técnica"
 
 # Estrutura de tópicos e códigos IVA válidos (White Martins)
 topics:
   compra_industrializacao:
     description: "Compra para industrialização — material manufaturado ou processo produtivo"
     codes:
-      - "I0"
-      - "ID"
-      - "IE"
-      - "I8"
-      - "I5"
-      - "I9"
-      - "I2"
-      - "I7"
-      - "I1"
-      - "I3"
-      - "I4"
+      - "I0"  # Importação
+      - "ID"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "IE"  # Fornecedor não Simples Nacional sem tributação
+      - "I8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "I5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "I9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "I2"  # Fornecedor não Simples Nacional com ICMS + ST (Substituição Tributária)
+      - "I7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "I1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "I3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "I4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+
   compra_comercializacao:
-    description: "Compra para comercialização — produto para revenda sem alteração"
+    description: "Compra para comercialização — revenda de produtos"
     codes:
-      - "R0"
-      - "ID"
-      - "R6"
-      - "R1"
-      - "R5"
-      - "R3"
-      - "R2"
-      - "R4"
-  compra_ativo_operacional:
-    description: "Compra de ativo operacional — máquinas, equipamentos, cilindros (CIAP imediato)"
-    codes:
-      - "C0"
-      - "C6"
-      - "CA"
-      - "CI"
-      - "CB"
-      - "CD"
-  compra_ativo_projeto:
-    description: "Compra de ativo de projeto — ativos em andamento (CIAP após conclusão)"
-    codes:
-      - "C0"
-      - "C6"
-      - "CE"
-      - "CH"
-      - "CF"
-      - "CG"
-  consumo_administrativo_ativo_nao_operacional:
-    description: "Consumo administrativo e ativo não operacional — escritório, limpeza, mesas, TI"
-    codes:
-      - "C0"
-      - "C6"
-      - "C1"
-      - "C5"
-      - "C3"
-      - "C8"
-      - "C9"
-  aquisicao_frete:
-    description: "Aquisição de frete — serviços de transporte"
-    codes:
-      - "F0"
-      - "F1"
-      - "F5"
-      - "FE"
-      - "FA"
-      - "F2"
-      - "FC"
-      - "F7"
-      - "F3"
-      - "FD"
-      - "FB"
-      - "F4"
-  aquisicao_energia_eletrica:
-    description: "Aquisição de energia elétrica — produtiva vs administrativa"
-    codes:
-      - "E1"
-      - "E2"
-      - "E3"
-      - "E4"
-      - "E0"
-  aquisicao_servicos_ligados_a_operacao:
-    description: "Aquisição de serviços ligados à operação — manutenção, assistência técnica, engenharia"
-    codes:
-      - "YE"
-      - "YH"
-      - "YC"
-      - "YB"
-  aquisicao_servicos_nao_ligados_a_operacao:
-    description: "Aquisição de serviços não ligados à operação — consultorias, auditorias, inspeções"
-    codes:
-      - "YD"
-      - "YA"
-      - "YG"
-      - "YF"
+      - "C0"  # Importação
+      - "CD"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "CE"  # Fornecedor não Simples Nacional sem tributação
+      - "C8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "C5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "C9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "C2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "C7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "C1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "C3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "C4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
 
-# Lista consolidada de todos os códigos válidos (para compatibilidade)
-valid_codes:
-  - "I0"
-  - "ID"
-  - "IE"
-  - "I8"
-  - "I5"
-  - "I9"
-  - "I2"
-  - "I7"
-  - "I1"
-  - "I3"
-  - "I4"
-  - "R0"
-  - "R6"
-  - "R1"
-  - "R5"
-  - "R3"
-  - "R2"
-  - "R4"
-  - "C0"
-  - "C6"
-  - "CA"
-  - "CI"
-  - "CB"
-  - "CD"
-  - "CE"
-  - "CH"
-  - "CF"
-  - "CG"
-  - "C1"
-  - "C5"
-  - "C3"
-  - "C8"
-  - "C9"
-  - "F0"
-  - "F1"
-  - "F5"
-  - "FE"
-  - "FA"
-  - "F2"
-  - "FC"
-  - "F7"
-  - "F3"
-  - "FD"
-  - "FB"
-  - "F4"
-  - "E1"
-  - "E2"
-  - "E3"
-  - "E4"
-  - "E0"
-  - "YE"
-  - "YH"
-  - "YC"
-  - "YB"
-  - "YD"
-  - "YA"
-  - "YG"
-  - "YF"
+  ativo_operacional:
+    description: "Ativo operacional — equipamentos e instalações para operação"
+    codes:
+      - "A0"  # Importação
+      - "AD"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "AE"  # Fornecedor não Simples Nacional sem tributação
+      - "A8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "A5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "A9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "A2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "A7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "A1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "A3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "A4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
 
-# Configurações de spam
-min_message_length: 3
+  ativo_projeto:
+    description: "Ativo de projeto — equipamentos para projetos específicos"
+    codes:
+      - "P0"  # Importação
+      - "PD"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "PE"  # Fornecedor não Simples Nacional sem tributação
+      - "P8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "P5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "P9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "P2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "P7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "P1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "P3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "P4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
 
-spam_patterns:
-  - "(.)\\1{4,}"  # Repetição excessiva de caracteres
-  - "^[0-9]+$"    # Apenas números
-  - "^[a-zA-Z]{1}$"  # Apenas uma letra
+  consumo_administrativo:
+    description: "Consumo administrativo — materiais para uso administrativo"
+    codes:
+      - "E0"  # Importação
+      - "ED"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "EE"  # Fornecedor não Simples Nacional sem tributação
+      - "E8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "E5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "E9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "E2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "E7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "E1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "E3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "E4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+
+  frete:
+    description: "Frete — serviços de transporte e logística"
+    codes:
+      - "F0"  # Importação
+      - "FD"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "FE"  # Fornecedor não Simples Nacional sem tributação
+      - "F8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "F5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "F9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "F2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "F7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "F1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "F3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "F4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+
+  energia_eletrica:
+    description: "Energia elétrica — serviços de fornecimento de energia"
+    codes:
+      - "Z0"  # Importação
+      - "ZD"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "ZE"  # Fornecedor não Simples Nacional sem tributação
+      - "Z8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "Z5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "Z9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "Z2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "Z7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "Z1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "Z3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "Z4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+
+  servicos_operacionais:
+    description: "Serviços operacionais — serviços relacionados à operação"
+    codes:
+      - "S0"  # Importação
+      - "SD"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "SE"  # Fornecedor não Simples Nacional sem tributação
+      - "S8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "S5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "S9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "S2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "S7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "S1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "S3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "S4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+
+  servicos_nao_operacionais:
+    description: "Serviços não-operacionais — serviços administrativos e de apoio"
+    codes:
+      - "N0"  # Importação
+      - "ND"  # Fornecedor microempresa optante pelo Simples Nacional
+      - "NE"  # Fornecedor não Simples Nacional sem tributação
+      - "N8"  # Fornecedor não Simples Nacional com apenas ICMS
+      - "N5"  # Fornecedor não Simples Nacional com apenas IPI
+      - "N9"  # Fornecedor não Simples Nacional com ICMS + IPI
+      - "N2"  # Fornecedor não Simples Nacional com ICMS + ST
+      - "N7"  # Fornecedor não Simples Nacional com ICMS + IPI + ST
+      - "N1"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "N3"  # Fornecedor beneficiado sem incidência de PIS/Cofins
+      - "N4"  # Fornecedor beneficiado sem incidência de PIS/Cofins
