@@ -136,9 +136,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     configure_agent_network()
-    #args = parse_args()
-    #agent = AGENT_REGISTRY[args.agent]
-    agent = AGENT_REGISTRY["interview"]
+    args = parse_args()
+    agent = AGENT_REGISTRY[args.agent]
+    #agent = AGENT_REGISTRY["interview"]
     print(f"Iniciando sessão com o agente: {agent.name}\n")
     
     asyncio.run(run_demo_loop_with_guardrails(agent))
