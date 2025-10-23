@@ -21,7 +21,7 @@ def load_triage_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         # Procura primeiro na pasta Template do cliente atual
         template_paths = [
             "AtendentePro/Template/White_Martins/triage_config.yaml",
-            "AtendentePro/Template/triage_config.yaml",
+            "AtendentePro/Template/standard/triage_config.yaml",
             "triage_config.yaml"
         ]
         
@@ -45,8 +45,7 @@ def load_guardrail_config(config_path: Optional[str] = None) -> Dict[str, Any]:
         # Procura primeiro na pasta Template do cliente atual
         template_paths = [
             "AtendentePro/Template/White_Martins/guardrails_config.yaml",
-            "AtendentePro/Template/guardrails_config.yaml",
-            "AtendentePro/guardrails_config_default.yaml",
+            "AtendentePro/Template/standard/guardrails_config.yaml",
             "guardrails_config.yaml"
         ]
         
