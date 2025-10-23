@@ -8,6 +8,22 @@ AtendentePro is a multi-agent customer-support workflow built with the OpenAI Ag
 
 ---
 
+## 📚 Documentação
+
+### Guias Principais
+- **[Setup Guide](../docs/SETUP.md)** - Guia completo de configuração para novos clientes
+- **[Architecture](../docs/ARCHITECTURE.md)** - Arquitetura e princípios do sistema
+
+### Documentação por Módulo
+- **[Triage Module](../docs/modules/triage.md)** - Sistema de roteamento inteligente
+- **[Guardrails Module](../docs/modules/guardrails.md)** - Proteção de escopo e rollback
+- **[Knowledge Module](../docs/modules/knowledge.md)** - Base de conhecimento e RAG
+
+### Exemplos Práticos
+- **[TechStore Configuration](../docs/examples/techstore_config.md)** - Exemplo completo de configuração
+
+---
+
 ## Agent Flow
 
 1. **Triage Agent (`Triage/triage_agent.py`)**
