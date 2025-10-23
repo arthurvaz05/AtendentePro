@@ -9,6 +9,7 @@ from typing import Dict, Any, Optional
 from pydantic import BaseModel
 from openai import AsyncOpenAI
 from pathlib import Path
+from AtendentePro.utils.openai_client import get_async_client
 
 
 class GuardrailOutput(BaseModel):
@@ -25,7 +26,8 @@ class GuardrailConfig:
     def __init__(self, config_path: Optional[str] = None):
         self.config_path = config_path or "guardrails_config_default.yaml"
         self.config = self._load_config()
-        self.client = AsyncOpenAI()
+        self.client = get_async_client()
+        #self.client = AsyncOpenAI()
     
     def _load_config(self) -> Dict[str, Any]:
         """Carrega configuração dos guardrails"""
