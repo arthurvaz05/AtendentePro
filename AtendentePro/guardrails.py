@@ -4,6 +4,7 @@ Utiliza chatcompletion para avaliar se mensagens estão de acordo com o escopo d
 """
 
 import asyncio
+import os
 import yaml
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
@@ -24,10 +25,26 @@ class GuardrailConfig:
     """Configuração dos guardrails"""
     
     def __init__(self, config_path: Optional[str] = None):
-        self.config_path = config_path or "guardrails_config_default.yaml"
+        self.config_path = config_path or self._find_config_file()
         self.config = self._load_config()
         self.client = get_async_client()
         #self.client = AsyncOpenAI()
+    
+    def _find_config_file(self) -> str:
+        """Encontra o arquivo de configuração apropriado"""
+        # Ordem de prioridade: específico do cliente -> standard -> fallback
+        config_paths = [
+            "AtendentePro/Template/White_Martins/guardrails_config.yaml",
+            "AtendentePro/Template/standard/guardrails_config.yaml",
+            "guardrails_config.yaml"
+        ]
+        
+        for path in config_paths:
+            if os.path.exists(path):
+                return path
+        
+        # Se nenhum arquivo for encontrado, retorna o primeiro como fallback
+        return config_paths[0]
     
     def _load_config(self) -> Dict[str, Any]:
         """Carrega configuração dos guardrails"""
