@@ -1,0 +1,62 @@
+# Configuração genérica DEFAULT do Triage Agent
+# Este arquivo serve como template base para configurações específicas de clientes
+
+agent_keywords:
+  flow_agent:
+    keywords:
+      - "fluxo"
+      - "processo"
+      - "workflow"
+      - "etapas"
+    description: "DEFAULT: Identifica perguntas sobre fluxos e processos"
+  
+  interview_agent:
+    keywords:
+      - "entrevista"
+      - "coleta"
+      - "informações"
+      - "dados"
+    description: "DEFAULT: Identifica perguntas sobre coleta de informações"
+  
+  answer_agent:
+    keywords:
+      - "resposta"
+      - "solução"
+      - "ajuda"
+      - "suporte"
+    description: "DEFAULT: Identifica perguntas que precisam de respostas diretas"
+  
+  confirmation_agent:
+    keywords:
+      - "confirmação"
+      - "validação"
+      - "verificação"
+      - "aprovação"
+    description: "DEFAULT: Identifica perguntas sobre confirmações e validações"
+  
+  knowledge_agent:
+    keywords:
+      - "conhecimento"
+      - "documentação"
+      - "manual"
+      - "base de conhecimento"
+    description: "DEFAULT: Identifica perguntas sobre documentação e conhecimento"
+  
+  usage_agent:
+    keywords:
+      - "uso"
+      - "como usar"
+      - "tutorial"
+      - "instruções"
+    description: "DEFAULT: Identifica perguntas sobre uso do sistema"
+
+routing_rules:
+  priority_order:
+    - "answer_agent"
+    - "knowledge_agent"
+    - "confirmation_agent"
+    - "interview_agent"
+    - "flow_agent"
+    - "usage_agent"
+  default_agent: "knowledge_agent"
+  # DEFAULT: Configuração genérica de roteamento

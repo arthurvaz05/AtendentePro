@@ -1,0 +1,114 @@
+# Configuração de Keywords para Triage Agent - White Martins
+# Keywords específicas para cada agente para melhorar o redirecionamento
+
+agent_keywords:
+  flow_agent:
+    keywords:
+      - "compra industrialização"
+      - "compra comercialização" 
+      - "ativo operacional"
+      - "ativo projeto"
+      - "consumo administrativo"
+      - "aquisição frete"
+      - "energia elétrica"
+      - "serviços ligados operação"
+      - "serviços não ligados operação"
+      - "tipo operação"
+      - "finalidade compra"
+      - "categoria operação"
+      - "codigo iva"
+      - "iva"
+    description: "Identifica e categoriza tipos de operações fiscais e comerciais"
+
+  interview_agent:
+    keywords:
+      - "simples nacional"
+      - "fornecedor optante"
+      - "impostos destacados"
+      - "icms"
+      - "ipi"
+      - "pis cofins"
+      - "retenção iss"
+      - "retenções federais"
+      - "entrevista"
+      - "coletar informações"
+      - "determinar código"
+      - "processo tributário"
+    description: "Conduz entrevistas estruturadas para determinação de códigos IVA"
+
+  answer_agent:
+    keywords:
+      - "código iva"
+      - "tributação"
+      - "impostos"
+      - "crédito tributário"
+      - "icms st"
+      - "ipi st"
+      - "pis cofins"
+      - "resposta técnica"
+      - "especificação"
+      - "aplicação"
+      - "solução"
+      - "recomendação"
+    description: "Fornece respostas técnicas sobre códigos IVA e tributação"
+
+  confirmation_agent:
+    keywords:
+      - "confirmar"
+      - "validar"
+      - "verificar"
+      - "código específico"
+      - "confirmação"
+      - "validação"
+      - "esclarecer dúvida"
+      - "confirmar informação"
+      - "validar processo"
+    description: "Confirma informações sobre códigos IVA específicos"
+
+  knowledge_agent:
+    keywords:
+      - "documento"
+      - "procedimento"
+      - "processo"
+      - "carta correção"
+      - "cancelamento"
+      - "manifestação destinatário"
+      - "recebimento nota fiscal"
+      - "determinação iva"
+      - "base conhecimento"
+      - "referência"
+      - "manual"
+      - "instrução"
+    description: "Acessa base de conhecimento sobre documentos fiscais"
+
+  usage_agent:
+    keywords:
+      - "como usar"
+      - "funcionalidade"
+      - "sistema"
+      - "ajuda"
+      - "orientação"
+      - "uso"
+      - "navegação"
+      - "comandos"
+      - "instruções"
+      - "tutorial"
+      - "guia"
+    description: "Orientações sobre uso do sistema de atendimento"
+
+# Configurações de redirecionamento
+routing_rules:
+  # Se contém keywords de múltiplos agentes, prioridade
+  priority_order:
+    - "answer_agent"      # Respostas técnicas têm prioridade
+    - "knowledge_agent"    # Documentos em segundo
+    - "confirmation_agent" # Confirmações em terceiro
+    - "interview_agent"    # Entrevistas em quarto
+    - "flow_agent"         # Categorização em quinto
+    - "usage_agent"        # Uso do sistema por último
+  
+  # Limiar de confiança para redirecionamento
+  confidence_threshold: 0.7
+  
+  # Fallback quando não há match claro
+  default_agent: "knowledge_agent"

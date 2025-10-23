@@ -1,0 +1,45 @@
+# Configuração genérica dos Guardrails
+# Este arquivo serve como template base para configurações específicas de clientes
+
+agent_scopes:
+  triage_agent:
+    about: |
+      O Triage Agent é responsável por rotear conversas para os agentes especializados.
+      Ele deve identificar se a pergunta do usuário se encaixa nos tópicos disponíveis no sistema.
+      Não deve responder sobre matemática, lição de casa, trabalho escolar, programação ou jogos.
+  
+  flow_agent:
+    about: |
+      O Flow Agent é responsável por gerenciar fluxos de trabalho e processos.
+      Ele deve ajudar com questões relacionadas a workflows, etapas de processo e fluxos operacionais.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
+  
+  interview_agent:
+    about: |
+      O Interview Agent é responsável por coletar informações através de entrevistas estruturadas.
+      Ele deve conduzir questionários e coletar dados necessários para resolver questões.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
+  
+  answer_agent:
+    about: |
+      O Answer Agent é responsável por fornecer respostas diretas e soluções.
+      Ele deve resolver questões específicas e fornecer informações precisas.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
+  
+  confirmation_agent:
+    about: |
+      O Confirmation Agent é responsável por validações e confirmações.
+      Ele deve verificar informações, confirmar ações e validar dados.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
+  
+  knowledge_agent:
+    about: |
+      O Knowledge Agent é responsável por consultar a base de conhecimento.
+      Ele deve buscar informações em documentação, manuais e bases de dados.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.
+  
+  usage_agent:
+    about: |
+      O Usage Agent é responsável por orientar sobre o uso do sistema.
+      Ele deve fornecer tutoriais, instruções e orientações sobre como usar o sistema.
+      Não deve responder sobre matemática, programação, entretenimento ou assuntos pessoais.

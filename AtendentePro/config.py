@@ -1,8 +1,12 @@
 # Configurações do Sistema de Agentes
 import os
+from dotenv import load_dotenv
+
+# Carregar variáveis do arquivo .env
+load_dotenv()
 
 # OpenAI API Key (obrigatório para funcionamento dos agentes)
-# Deve ser configurada como variável de ambiente OPENAI_API_KEY
+# Deve ser configurada como variável de ambiente OPENAI_API_KEY ou no arquivo .env
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 if not OPENAI_API_KEY:
