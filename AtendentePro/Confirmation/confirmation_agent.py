@@ -5,6 +5,7 @@ from agents import Agent
 from AtendentePro import config
 from AtendentePro.Confirmation.confirmation_prompts import prompts_confirmation_agent
 from AtendentePro.context import ContextNote
+from AtendentePro.guardrails import get_guardrails_for_agent
 
 
 confirmation_agent = Agent[ContextNote](
@@ -15,4 +16,5 @@ confirmation_agent = Agent[ContextNote](
         f"{prompts_confirmation_agent}"
     ),
     handoffs=[],
+    input_guardrails=get_guardrails_for_agent("confirmation_agent"),
 )

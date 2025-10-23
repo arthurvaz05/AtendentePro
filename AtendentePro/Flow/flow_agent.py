@@ -7,6 +7,7 @@ from AtendentePro.Flow.flow_prompts import flow_prompts_agent
 from AtendentePro.Interview.interview_prompts import interview_template
 from AtendentePro.Flow.flow_models import FlowOutput
 from AtendentePro.context import ContextNote
+from AtendentePro.guardrails import get_guardrails_for_agent
 
 flow_agent = Agent[ContextNote](
     name="Flow Agent",
@@ -22,4 +23,5 @@ flow_agent = Agent[ContextNote](
     ),
     handoffs=[],  # Será configurado pelo agent_network.py
     # output_type=FlowOutput,
+    input_guardrails=get_guardrails_for_agent("flow_agent"),
 )

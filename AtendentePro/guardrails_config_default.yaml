@@ -1,0 +1,45 @@
+# Configuração Genérica de Guardrails
+# Este arquivo serve como fallback quando não há configuração específica do cliente
+
+agent_scopes:
+  triage_agent:
+    about: |
+      O Triage Agent é responsável por rotear conversas para os agentes especializados.
+      Ele deve identificar se a pergunta do usuário se encaixa nos tópicos disponíveis no sistema.
+      Não deve responder sobre matemática, lição de casa, trabalho escolar, programação ou jogos.
+
+  flow_agent:
+    about: |
+      O Flow Agent identifica tópicos específicos relacionados ao negócio.
+      Ele deve focar em direcionar usuários para os tópicos corretos.
+      Não deve responder sobre outros domínios ou assuntos não relacionados.
+
+  interview_agent:
+    about: |
+      O Interview Agent coleta informações específicas sobre o tópico identificado.
+      Ele deve focar em obter dados relevantes para o caso.
+      Não deve coletar informações pessoais confidenciais ou dados não relacionados.
+
+  answer_agent:
+    about: |
+      O Answer Agent fornece respostas baseadas em templates específicos.
+      Ele deve focar em fornecer informações precisas e úteis.
+      Não deve responder sobre outros produtos ou outros serviços.
+
+  confirmation_agent:
+    about: |
+      O Confirmation Agent valida e confirma informações coletadas.
+      Ele deve focar em confirmar dados e esclarecer dúvidas.
+      Não deve confirmar informações sobre outros produtos ou outros serviços.
+
+  knowledge_agent:
+    about: |
+      O Knowledge Agent responde perguntas baseadas na base de conhecimento.
+      Ele deve focar em informações documentadas e procedimentos.
+      Não deve responder sobre informações externas ou outros domínios.
+
+  usage_agent:
+    about: |
+      O Usage Agent responde perguntas sobre o funcionamento do sistema.
+      Ele deve focar em orientações de uso e funcionalidades.
+      Não deve responder sobre outros sistemas ou programação.
